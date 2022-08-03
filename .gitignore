@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### Rest Docs ###
-**/src/docs/**
+**/static/docs/**
 
 ### yml file ###
 *.yml
