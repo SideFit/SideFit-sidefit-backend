@@ -26,3 +26,16 @@ include::{snippets}/healthcheck/http-request.adoc[]
 === Response
 Response:
 include::{snippets}/healthcheck/http-response.adoc[]
+
+== notification
+=== 알림 전송
+==== Request
+include::{snippets}/send notification/request-fields.adoc[]
+==== Response
+include::{snippets}/send notification/response-fields.adoc[]
+
+=== 알림 조회
+==== Request
+include::{snippets}/get notifications/request-parameters.adoc[]
+==== Response
+include::{snippets}/get notifications/response-fields.adoc[]
