@@ -6,7 +6,9 @@ import com.project.sidefit.config.security.JwtProvider;
 import com.project.sidefit.domain.entity.Image;
 import com.project.sidefit.domain.entity.User;
 import com.project.sidefit.domain.enums.NotificationType;
-import com.project.sidefit.domain.service.dto.TokenDto;
+import com.project.sidefit.domain.repository.ImageRepository;
+import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.service.NotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +23,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 import static com.project.sidefit.api.dto.NotificationDto.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -40,6 +40,15 @@ public class NotificationTest {
 
     @Autowired
     private NotificationApiController notificationApiController;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -95,9 +104,9 @@ public class NotificationTest {
         Image image = new Image("testImage", "");
         User sender = new User(image, "sender");
         User receiver = new User(image, "receiver");
-        em.persist(image);
-        em.persist(sender); // id: 2
-        em.persist(receiver); // id: 3
+        imageRepository.save(image);
+        userRepository.save(sender);
+        userRepository.save(receiver);
 
         String json = "{\n" +
                 " \"senderId\" : \"2\",\n" +
@@ -141,20 +150,20 @@ public class NotificationTest {
         Image image = new Image("testImage", "");
         User sender = new User(image, "sender");
         User receiver = new User(image, "receiver");
-        em.persist(image);
-        em.persist(sender); // id: 2
-        em.persist(receiver); // id: 3
+        imageRepository.save(image);
+        userRepository.save(sender);
+        userRepository.save(receiver);
 
         for (int i = 1; i <= 5; i++) {
-            NotificationRequestDto dto = new NotificationRequestDto("2", "3", "test" + i, NotificationType.CHAT);
-            notificationApiController.sendNotification(dto);
+            NotificationRequestDto dto = new NotificationRequestDto(String.valueOf(sender.getId()), String.valueOf(receiver.getId()), "test" + i, NotificationType.CHAT);
+            notificationService.sendNotification(dto);
             Thread.sleep(10);
         }
 
         //when
         ResultActions result = mockMvc.perform(get("/api/notification/list")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("receiverId", "3")
+                .param("receiverId", String.valueOf(receiver.getId()))
         );
 
         //then
