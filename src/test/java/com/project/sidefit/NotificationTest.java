@@ -61,40 +61,6 @@ public class NotificationTest {
 
     @Autowired
     private EntityManager em;
-    
-    @Test
-    @WithMockUser
-    @DisplayName("GET /api/sse/connect/{userId}")
-    void connect_test() throws Exception {
-        //given
-        Image image = new Image("testImage", "");
-        User user = new User(image, "tester");
-        em.persist(image);
-        em.persist(user); // id: 2
-
-        TokenDto tokenDto = jwtProvider.createTokenDto(user.getId(), List.of("ROLE_ADMIN"));
-        String token = tokenDto.getAccessToken();
-        String userId = String.valueOf(user.getId());
-
-        //when
-        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/sse/connect/" + userId)
-                .contentType(MediaType.TEXT_EVENT_STREAM)
-                .header("X-AUTH-TOKEN", token)
-        );
-
-        //then
-        result.andExpect(status().isOk())
-                .andDo(document("sse connection",
-                        pathParameters(
-                                parameterWithName("userId").description("사옹자 id")
-                        ),
-                        responseFields(
-                                fieldWithPath("id").description("sse emitter ID"),
-                                fieldWithPath("event").description("이벤트 이름"),
-                                fieldWithPath("data").description("데이터")
-                        )
-                ));
-    }
 
     @Test
     @WithMockUser
