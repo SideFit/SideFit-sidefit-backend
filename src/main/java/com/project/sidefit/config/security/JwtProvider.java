@@ -1,5 +1,6 @@
 package com.project.sidefit.config.security;
 
+import com.project.sidefit.advice.exception.CAuthenticationEntryPointException;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.Base64UrlCodec;
@@ -26,8 +27,8 @@ public class JwtProvider {
     @Value("spring.jwt.secret")
     private String secretKey;
     private final String ROLES = "roles";
-    private final Long accessTokenValidMillisecond = 60 * 60 * 1000L; // 1 hour
-    private final Long refreshTokenValidMillisecond = 14 * 24 * 60 * 60 * 1000L; // 14 day
+    private final Long ACCESSTOKEN_VALID_MILLISECOND = 60 * 60 * 1000L; // 1 hour
+    private final Long REFRESHTOKEN_VALID_MILLISECOND = 14 * 24 * 60 * 60 * 1000L; // 14 day
     private final UserDetailsService userDetailsService;
 
     @PostConstruct
@@ -36,6 +37,7 @@ public class JwtProvider {
     }
 
     // jwt 생성
+    // TODO 메서드로 분리
     public TokenDto createTokenDto(Long userPk, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userPk));
         claims.put(ROLES, roles);
@@ -46,13 +48,13 @@ public class JwtProvider {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
+                .setExpiration(new Date(now.getTime() + ACCESSTOKEN_VALID_MILLISECOND))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setExpiration(new Date(now.getTime() + refreshTokenValidMillisecond))
+                .setExpiration(new Date(now.getTime() + REFRESHTOKEN_VALID_MILLISECOND))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
 
@@ -60,7 +62,7 @@ public class JwtProvider {
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .accessTokenExpireDate(accessTokenValidMillisecond)
+                .accessTokenExpireDate(ACCESSTOKEN_VALID_MILLISECOND)
                 .build();
     }
 
@@ -69,10 +71,9 @@ public class JwtProvider {
         Claims claims = parseClaims(token);
 
         // 권한 정보가 없는 경우
-        /*if (claims.get(ROLES) == null) {
+        if (claims.get(ROLES) == null) {
             throw new CAuthenticationEntryPointException();
-        }*/
-        log.info("user id: {}", claims.getSubject());
+        }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
@@ -96,8 +97,14 @@ public class JwtProvider {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            log.error("jwt 에러");
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 Jwt 서명입니다.");
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.error("지원하지 않는 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 토큰입니다.");
         }
         return false;
     }
