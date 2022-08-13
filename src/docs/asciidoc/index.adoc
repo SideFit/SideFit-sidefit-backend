@@ -28,7 +28,7 @@ Response:
 include::{snippets}/healthcheck/http-response.adoc[]
 
 == User
-=== email 중복 체크
+=== email 중복체크
 RequestBody
 include::{snippets}/check_email_duplicate/request-fields.adoc[]
 ResponseBody
@@ -72,6 +72,15 @@ include::{snippets}/email_auth_check/response-fields.adoc[]
 include::{snippets}/email_auth_check/http-request.adoc[]
 include::{snippets}/email_auth_check/http-response.adoc[]
 include::{snippets}/email_auth_check/curl-request.adoc[]
+
+=== 닉네임 중복체크
+RequestBody
+include::{snippets}/check_nickname_duplicate/request-fields.adoc[]
+ResponseBody
+include::{snippets}/check_nickname_duplicate/response-fields.adoc[]
+include::{snippets}/check_nickname_duplicate/http-request.adoc[]
+include::{snippets}/check_nickname_duplicate/http-response.adoc[]
+include::{snippets}/check_nickname_duplicate/curl-request.adoc[]
 
 === email 회원가입
 RequestBody

@@ -107,10 +107,10 @@ public class SignController {
     @GetMapping("/email/auth/check")
     public Response checkEmailAuth(@RequestBody EmailRequestDto emailRequestDto) {
         if (signService.checkEmailAuth(emailRequestDto.getEmail())) {
-            return Response.failure(1000, "인증X");
+            return Response.success();
         }
 
-        return Response.success();
+        return Response.failure(1000, "인증X");
     }
 
 

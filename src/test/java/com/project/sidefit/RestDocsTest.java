@@ -1,12 +1,10 @@
 package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.sidefit.api.dto.sign.EmailRequestDto;
-import com.project.sidefit.api.dto.sign.UserJoinRequest;
-import com.project.sidefit.api.dto.sign.UserLoginRequestDto;
-import com.project.sidefit.api.dto.sign.UserPrevRequestDto;
+import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.security.SignService;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +91,7 @@ public class RestDocsTest {
         result.andExpect(status().isOk())
                 .andDo(document("check_email_duplicate",
                         requestFields(
-                                fieldWithPath("email").type(STRING).description("검사할 email")
+                                fieldWithPath("email").type(STRING).description("email")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
@@ -191,14 +189,14 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Get /api/auth/email/check/success : 이메일 인증 체크")
+    @DisplayName("Get /api/auth/email/auth/check : 이메일 인증 체크")
     public void emailCheck() throws Exception {
         //given
         EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
         given(signService.checkEmailAuth(any(String.class))).willReturn(true);
 
         //when
-        ResultActions result = this.mockMvc.perform(get("/api/auth/email/check/success")
+        ResultActions result = this.mockMvc.perform(get("/api/auth/email/auth/check")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(APPLICATION_JSON)
@@ -209,6 +207,36 @@ public class RestDocsTest {
                 .andDo(document("email_auth_check",
                         requestFields(
                                 fieldWithPath("email").type(STRING).description("이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("반환 데이터")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("Get /api/auth/nickname/check : 닉네임 중복 체크")
+    public void checkNicknameDuplicate() throws Exception {
+
+
+        //given
+        given(signService.validateDuplicatedNickname(anyString())).willReturn(false);
+
+        //when
+        NicknameRequestDto request = NicknameRequestDto.builder().nickname("testUser").build();
+        ResultActions result = this.mockMvc.perform(get("/api/auth/nickname/check")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("check_nickname_duplicate",
+                        requestFields(
+                                fieldWithPath("nickname").type(STRING).description("닉네임")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
