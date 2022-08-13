@@ -28,14 +28,36 @@ Response:
 include::{snippets}/healthcheck/http-response.adoc[]
 
 == notification
+=== sse 연결
+HTTP Request
+include::{snippets}/sse connection/http-request.adoc[]
+HTTP Response
+include::{snippets}/sse connection/response-body.adoc[]
+CURL
+include::{snippets}/sse connection/curl-request.adoc[]
+
 === 알림 전송
-==== Request
+RequestParameters
+include::{snippets}/send notification/request-parameters.adoc[]
+RequestBody
 include::{snippets}/send notification/request-fields.adoc[]
-==== Response
+ResponseBody
 include::{snippets}/send notification/response-fields.adoc[]
+HTTP Request
+include::{snippets}/send notification/http-request.adoc[]
+HTTP Response
+include::{snippets}/send notification/http-response.adoc[]
+CURL
+include::{snippets}/send notification/curl-request.adoc[]
 
 === 알림 조회
-==== Request
+RequestParameters
 include::{snippets}/get notifications/request-parameters.adoc[]
-==== Response
+ResponseBody
 include::{snippets}/get notifications/response-fields.adoc[]
+HTTP Request
+include::{snippets}/get notifications/http-request.adoc[]
+HTTP Response
+include::{snippets}/get notifications/http-response.adoc[]
+CURL
+include::{snippets}/get notifications/curl-request.adoc[]
