@@ -117,6 +117,12 @@ public class SignController {
     /**
      * 이메일 재전송 api
      */
+    @PostMapping("/email/again")
+    public Response sendEmailAgain(@RequestBody EmailRequestDto emailRequestDto) {
+
+        signService.sendAuthEmailAgain(emailRequestDto.getEmail());
+        return Response.success();
+    }
 
 
     /**

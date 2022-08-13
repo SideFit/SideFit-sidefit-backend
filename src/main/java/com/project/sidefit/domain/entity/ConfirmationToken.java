@@ -20,7 +20,9 @@ public class ConfirmationToken extends BaseTime {
     // UUID
     @Id
     @Column(name = "confirmation_token_id")
-    private String id;
+    private Long id;
+
+    private String token;
 
     private boolean expired;
 
@@ -31,12 +33,17 @@ public class ConfirmationToken extends BaseTime {
     public static ConfirmationToken createEmailConfirmationToken(String email) {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         String uuid = UUID.randomUUID().toString();
-        confirmationToken.id = uuid;
+        confirmationToken.token = uuid;
         confirmationToken.expired = false;
         confirmationToken.email = email;
         confirmationToken.expiration = LocalDateTime.now().plusMinutes(EMAIL_TOKEN_VALID_MINUTE);
 
         return confirmationToken;
+    }
+
+    public void updateToken() {
+        String uuid = UUID.randomUUID().toString();
+        this.token = uuid;
     }
 
     public void useToken() {
