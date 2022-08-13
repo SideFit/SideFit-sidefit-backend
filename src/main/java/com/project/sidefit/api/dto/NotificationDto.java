@@ -1,7 +1,6 @@
 package com.project.sidefit.api.dto;
 
 import com.project.sidefit.domain.entity.Notification;
-import com.project.sidefit.domain.entity.User;
 import com.project.sidefit.domain.enums.NotificationType;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
@@ -19,6 +18,18 @@ public class NotificationDto {
     @AllArgsConstructor
     public static class NotificationRequestDto {
 
+        @NotBlank
+        private String content;
+
+        @NotNull
+        private NotificationType type; // CHAT, PERSONAL
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NotificationListenDto {
+
         @NotNull
         private String senderId;
 
@@ -30,14 +41,6 @@ public class NotificationDto {
 
         @NotNull
         private NotificationType type;
-
-        public NotificationRequestDto(String senderId) {
-            this.senderId = senderId;
-        }
-
-        public Notification toEntity(User sender, User receiver) {
-            return new Notification(sender, receiver, content, type);
-        }
     }
 
     @Getter
@@ -49,7 +52,7 @@ public class NotificationDto {
         private Long senderId;
         private Long receiverId;
         private String content;
-        private NotificationType type;
+        private NotificationType type; // CHAT, PERSONAL
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
 

@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Builder
+//@Builder
 @Getter
-@AllArgsConstructor
+@Table(name = "users")
+//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTime implements UserDetails {
 
@@ -22,6 +23,10 @@ public class User extends BaseTime implements UserDetails {
     @GeneratedValue
     @Column(name = "user_id")
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     // unique, not null
     private String email;
@@ -35,8 +40,6 @@ public class User extends BaseTime implements UserDetails {
             name = "roles",
             joinColumns = @JoinColumn(name = "user_id"))
     private List<String> roles = new ArrayList<>();
-
-//    private Image image;
 
     // unique, not null
     private String nickname;
@@ -73,6 +76,10 @@ public class User extends BaseTime implements UserDetails {
         user.roles.add("ROLE_USER");
 
         return user;
+    }
+
+    public void updateImage(Image image) {
+        this.image = image;
     }
 
     @Override

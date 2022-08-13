@@ -1,6 +1,5 @@
 package com.project.sidefit.domain.entity;
 
-import com.project.sidefit.domain.TimeEntity;
 import com.project.sidefit.domain.enums.NotificationType;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends TimeEntity {
+public class Notification extends BaseTime {
 
     @Id
     @GeneratedValue

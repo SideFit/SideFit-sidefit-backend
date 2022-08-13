@@ -1,8 +1,8 @@
-package com.project.sidefit.domain.service;
+package com.project.sidefit.domain.service.notification;
 
 import com.project.sidefit.domain.entity.Notification;
 import com.project.sidefit.domain.entity.User;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.notification.EmitterRepository;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepo userRepository;
 
     private static final Long DEFAULT_TIMEOUT = 60 * 60 * 1000L;
 
@@ -53,19 +53,17 @@ public class NotificationService {
         return emitter;
     }
 
-    public Long sendNotification(NotificationRequestDto notificationRequestDto) {
-        String senderId = notificationRequestDto.getSenderId();
-        String receiverId = notificationRequestDto.getReceiverId();
+    public Long sendNotification(NotificationRequestDto notificationRequestDto, Long senderId, Long receiverId) {
+        User sender = userRepository.getReferenceById(senderId);
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new IllegalStateException("This receiver is null: " + receiverId));
+        Notification notification = new Notification(sender, receiver, notificationRequestDto.getContent(), notificationRequestDto.getType());
 
-        User sender = userRepository.getReferenceById(Long.valueOf(senderId));
-        User receiver = userRepository.getReferenceById(Long.valueOf(receiverId));
-        Notification notification = notificationRequestDto.toEntity(sender, receiver);
-
-        Map<String, SseEmitter> emitters = emitterRepository.findEmittersWithUserId(receiverId);
+        Map<String, SseEmitter> emitters = emitterRepository.findEmittersWithUserId(String.valueOf(receiverId));
         emitters.forEach(
                 (emitterId, emitter) -> {
                     emitterRepository.saveEventCache(emitterId, notification);
-                    sendMessage(emitter, receiverId, new NotificationResponseDto(notification));
+                    sendMessage(emitter, String.valueOf(receiverId), new NotificationResponseDto(notification));
                 }
         );
 
@@ -80,6 +78,13 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationResponseDto> findNotificationDtoList() {
         return notificationRepository.findAll().stream()
+                .map(NotificationResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<NotificationResponseDto> findNotificationDtoListWithSenderAndReceiverId(Long senderId, Long receiverId) {
+        return notificationRepository.findWithSenderIdAndReceiverId(senderId, receiverId).stream()
                 .map(NotificationResponseDto::new)
                 .collect(Collectors.toList());
     }
