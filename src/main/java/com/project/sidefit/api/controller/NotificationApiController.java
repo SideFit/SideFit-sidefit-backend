@@ -1,16 +1,14 @@
 package com.project.sidefit.api.controller;
 
+import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.config.security.JwtProvider;
+import com.project.sidefit.domain.entity.User;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
-import com.project.sidefit.domain.service.NotificationService;
+import com.project.sidefit.domain.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.List;
 
 import static com.project.sidefit.api.dto.NotificationDto.*;
 
@@ -23,24 +21,41 @@ public class NotificationApiController {
     private final NotificationService notificationService;
     private final JwtProvider jwtProvider;
 
-    // TODO: 편의상 userId 를 받게 하였지만, 추후 jwt token 을 받을 예정
-    @GetMapping(value = "/sse/connect/{userId}", produces = "text/event-stream")
+    @GetMapping(value = "/sse/connect", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)
-    public SseEmitter connect(@PathVariable String userId, @RequestHeader(value = "Last-Event_ID", defaultValue = "", required = false) String lastEventId) {
-//        Authentication authentication = jwtProvider.getAuthentication(token);
-//        UserDetails principal = (UserDetails) authentication.getPrincipal();
-//        String userId = principal.getUsername();
-        return notificationService.connect(Long.valueOf(userId), lastEventId);
+    public Response connect(@RequestHeader(value = "X-AUTH-TOKEN", required = false) String token,
+                            @RequestHeader(value = "Last-Event-ID", defaultValue = "", required = false) String lastEventId) {
+        if (token.isEmpty()) {
+            return Response.failure(400, "토큰이 존재하지 않습니다.");
+        }
+        Authentication authentication = jwtProvider.getAuthentication(token);
+        User principal = (User) authentication.getPrincipal();
+        notificationService.connect(principal.getId(), lastEventId);
+
+        return Response.success();
     }
 
     @PostMapping("/notification/send")
-    public NotificationResponseDto sendNotification(@RequestBody NotificationRequestDto notificationRequestDto) {
-        Long notificationId = notificationService.sendNotification(notificationRequestDto);
-        return notificationService.findNotificationDto(notificationId);
+    public Response sendNotification(@RequestHeader(value = "X-AUTH-TOKEN", required = false) String token, @RequestParam String receiverId,
+                                     @RequestBody NotificationRequestDto notificationRequestDto) {
+        if (token.isEmpty()) {
+            return Response.failure(400, "토큰이 존재하지 않습니다.");
+        }
+        Authentication authentication = jwtProvider.getAuthentication(token);
+        User principal = (User) authentication.getPrincipal();
+        notificationService.sendNotification(notificationRequestDto, Long.valueOf(principal.getUsername()), Long.valueOf(receiverId));
+
+        return Response.success(notificationService.findNotificationDtoListWithSenderAndReceiverId(principal.getId(), Long.valueOf(receiverId)));
     }
 
     @GetMapping("/notification/list")
-    public List<NotificationQueryDto> getNotifications(@RequestParam String receiverId) {
-        return notificationRepository.findNotificationsWithReceiverId(Long.valueOf(receiverId));
+    public Response getNotifications(@RequestHeader(value = "X-AUTH-TOKEN", required = false) String token) {
+        if (token.isEmpty()) {
+            return Response.failure(400, "토큰이 존재하지 않습니다.");
+        }
+        Authentication authentication = jwtProvider.getAuthentication(token);
+        User principal = (User) authentication.getPrincipal();
+
+        return Response.success(notificationRepository.findNotificationsWithReceiverId(principal.getId()));
     }
 }
