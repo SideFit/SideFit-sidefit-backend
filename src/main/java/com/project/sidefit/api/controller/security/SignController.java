@@ -1,6 +1,5 @@
 package com.project.sidefit.api.controller.security;
 
-import com.project.sidefit.api.dto.jwt.TokenRequestDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.api.dto.sign.UserPrevRequestDto;
@@ -15,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 // TODO validation 에 대한 BindingResult 처리, type 안맞는 경우에 대한 예외처리 >> event 이용?
 @Slf4j
@@ -24,10 +22,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SignController {
 
-//    private final JwtProvider jwtProvider;
 
     private final SignService signService;
-    private final MailService mailService;
 
     /**
      * 이메일 중복 확인
@@ -40,9 +36,6 @@ public class SignController {
 
         return Response.failure(-1000, "이미 존재하는 이메일입니다.");
     }
-
-    // 넘어온 데이터들이 validation 통과하면 인증메일 전송
-    // 임시 테이블에 저장
 
     /**
      * validation 체크
