@@ -23,6 +23,10 @@ public class User extends BaseTime implements UserDetails {
     @Column(name = "user_id")
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     // unique, not null
     private String email;
 
@@ -35,8 +39,6 @@ public class User extends BaseTime implements UserDetails {
             name = "roles",
             joinColumns = @JoinColumn(name = "user_id"))
     private List<String> roles = new ArrayList<>();
-
-//    private Image image;
 
     // unique, not null
     private String nickname;
