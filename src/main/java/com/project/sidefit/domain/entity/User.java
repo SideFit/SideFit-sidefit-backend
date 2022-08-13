@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Builder
+//@Builder
 @Getter
-@AllArgsConstructor
+@Table(name = "users")
+//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTime implements UserDetails {
 
@@ -75,6 +76,10 @@ public class User extends BaseTime implements UserDetails {
         user.roles.add("ROLE_USER");
 
         return user;
+    }
+
+    public void updateImage(Image image) {
+        this.image = image;
     }
 
     @Override
