@@ -45,6 +45,10 @@ public class SignService {
         return userJpaRepo.existsByEmail(email);
     }
 
+    public boolean validateDuplicatedNickname(String nickname) {
+        return userJpaRepo.existsByNickname(nickname);
+    }
+
 
     @Transactional
     public Long saveUserPrev(String email, String password) {

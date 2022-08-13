@@ -1,10 +1,7 @@
 package com.project.sidefit.api.controller.security;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.api.dto.sign.EmailRequestDto;
-import com.project.sidefit.api.dto.sign.UserPrevRequestDto;
-import com.project.sidefit.api.dto.sign.UserJoinRequest;
-import com.project.sidefit.api.dto.sign.UserLoginRequestDto;
+import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.mail.MailService;
 import com.project.sidefit.domain.service.security.SignService;
@@ -29,12 +26,13 @@ public class SignController {
      * 이메일 중복 확인
      */
     @GetMapping("/email/check")
-    public Response emailCheck(@RequestBody EmailRequestDto emailRequestDto) {
-        if (!signService.validateDuplicatedEmail(emailRequestDto.getEmail())) {
-            return Response.success();
+    public Response checkEmailDuplicate(@RequestBody EmailRequestDto emailRequestDto) {
+        if (signService.validateDuplicatedEmail(emailRequestDto.getEmail())) {
+            // TODO 상태코드 번호 정하기, 현재 임시로 -1000 사용
+            return Response.failure(-1000, "이미 존재하는 이메일입니다.");
         }
 
-        return Response.failure(-1000, "이미 존재하는 이메일입니다.");
+        return Response.success();
     }
 
     /**
@@ -46,7 +44,7 @@ public class SignController {
      * UserPrev에 email, pw 저장 
      */
     @PostMapping("/email/save")
-    public Response saveEmail(@Validated @RequestBody UserPrevRequestDto userPrevRequestDto, BindingResult bindingResult) {
+    public Response saveEmailPassword(@Validated @RequestBody UserPrevRequestDto userPrevRequestDto, BindingResult bindingResult) {
 
         String email = userPrevRequestDto.getEmail();
         String password = userPrevRequestDto.getPassword();
@@ -96,7 +94,7 @@ public class SignController {
      * 문제 발생 >> 크롬에서 링크를 눌렀을 경우 정상처리는 되지만 error 발생, postman 에서 테스트 한 경우는 정상동작
      */
     @GetMapping("/confirm-email/{token}")
-    public Response verify(@PathVariable String token) {
+    public Response emailAuth(@PathVariable String token) {
         // token 부분을 uuid 에서 인증토큰으로 변경
         // 토큰용 entity 생성 >> 추후 Redis 로 수정시 해결
         signService.confirmEmail(token);
@@ -106,19 +104,34 @@ public class SignController {
     /**
      * 이메일 인증여부 확인
      */
-    @GetMapping("/email/check/success")
-    public Response checkAuth(@RequestBody EmailRequestDto emailRequestDto) {
+    @GetMapping("/email/auth/check")
+    public Response checkEmailAuth(@RequestBody EmailRequestDto emailRequestDto) {
         if (signService.checkEmailAuth(emailRequestDto.getEmail())) {
-            return Response.success();
+            return Response.failure(1000, "인증X");
         }
 
-        return Response.failure(1000, "인증X");
+        return Response.success();
     }
 
 
     /**
      * 이메일 재전송 api
      */
+
+
+    /**
+     * 닉네임 중복 체크 api
+     */
+    @GetMapping("/nickname/check")
+    public Response checkNicknameDuplicate(@RequestBody NicknameRequestDto nicknameRequestDto) {
+
+        if (signService.validateDuplicatedNickname(nicknameRequestDto.getNickname())) {
+            return Response.failure(-1000, "이미 존재하는 닉네임입니다.");
+        }
+
+        return Response.success();
+    }
+
 
     /**
      * 이메일 인증이 완료된 후 최종 회원가입
