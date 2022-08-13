@@ -27,37 +27,79 @@ include::{snippets}/healthcheck/http-request.adoc[]
 Response:
 include::{snippets}/healthcheck/http-response.adoc[]
 
-== notification
-=== sse 연결
-HTTP Request
-include::{snippets}/sse connection/http-request.adoc[]
-HTTP Response
-include::{snippets}/sse connection/response-body.adoc[]
-CURL
-include::{snippets}/sse connection/curl-request.adoc[]
-
-=== 알림 전송
-RequestParameters
-include::{snippets}/send notification/request-parameters.adoc[]
+== User
+=== email 중복 체크
 RequestBody
-include::{snippets}/send notification/request-fields.adoc[]
+include::{snippets}/check_email_duplicate/request-fields.adoc[]
 ResponseBody
+include::{snippets}/check_email_duplicate/response-fields.adoc[]
+include::{snippets}/check_email_duplicate/http-request.adoc[]
+include::{snippets}/check_email_duplicate/http-response.adoc[]
+include::{snippets}/check_email_duplicate/curl-request.adoc[]
+
+=== email, pw 저장
+RequestBody
+include::{snippets}/save_userPrev/request-fields.adoc[]
+ResponseBody
+include::{snippets}/save_userPrev/response-fields.adoc[]
+include::{snippets}/save_userPrev/http-request.adoc[]
+include::{snippets}/save_userPrev/http-response.adoc[]
+include::{snippets}/save_userPrev/curl-request.adoc[]
+
+=== email로 인증링크 전송
+RequestBody
+include::{snippets}/send_email_auth/request-fields.adoc[]
+ResponseBody
+include::{snippets}/send_email_auth/response-fields.adoc[]
+include::{snippets}/send_email_auth/http-request.adoc[]
+include::{snippets}/send_email_auth/http-response.adoc[]
+include::{snippets}/send_email_auth/curl-request.adoc[]
+
+=== email 인증처리
+RequestBody
+include::{snippets}/confirm_email/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/confirm_email/response-fields.adoc[]
+include::{snippets}/confirm_email/http-request.adoc[]
+include::{snippets}/confirm_email/http-response.adoc[]
+include::{snippets}/confirm_email/curl-request.adoc[]
+
+=== email 인증 체크
+RequestBody
+include::{snippets}/email_auth_check/request-fields.adoc[]
+ResponseBody
+include::{snippets}/email_auth_check/response-fields.adoc[]
+include::{snippets}/email_auth_check/http-request.adoc[]
+include::{snippets}/email_auth_check/http-response.adoc[]
+include::{snippets}/email_auth_check/curl-request.adoc[]
+
+=== email 회원가입
+RequestBody
+include::{snippets}/user_join/request-fields.adoc[]
+ResponseBody
+include::{snippets}/user_join/response-fields.adoc[]
+include::{snippets}/user_join/http-request.adoc[]
+include::{snippets}/user_join/http-response.adoc[]
+include::{snippets}/user_join/curl-request.adoc[]
+
+=== email 로그인
+RequestBody
+include::{snippets}/email_login/request-fields.adoc[]
+ResponseBody
+include::{snippets}/email_login/response-fields.adoc[]
+include::{snippets}/email_login/http-request.adoc[]
+include::{snippets}/email_login/http-response.adoc[]
+include::{snippets}/email_login/curl-request.adoc[]
+
+== notification
+=== 알림 전송
+==== Request
+include::{snippets}/send notification/request-fields.adoc[]
+==== Response
 include::{snippets}/send notification/response-fields.adoc[]
-HTTP Request
-include::{snippets}/send notification/http-request.adoc[]
-HTTP Response
-include::{snippets}/send notification/http-response.adoc[]
-CURL
-include::{snippets}/send notification/curl-request.adoc[]
 
 === 알림 조회
-RequestParameters
+==== Request
 include::{snippets}/get notifications/request-parameters.adoc[]
-ResponseBody
+==== Response
 include::{snippets}/get notifications/response-fields.adoc[]
-HTTP Request
-include::{snippets}/get notifications/http-request.adoc[]
-HTTP Response
-include::{snippets}/get notifications/http-response.adoc[]
-CURL
-include::{snippets}/get notifications/curl-request.adoc[]
