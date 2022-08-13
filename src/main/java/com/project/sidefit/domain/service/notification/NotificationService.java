@@ -53,19 +53,17 @@ public class NotificationService {
         return emitter;
     }
 
-    public Long sendNotification(NotificationRequestDto notificationRequestDto) {
-        String senderId = notificationRequestDto.getSenderId();
-        String receiverId = notificationRequestDto.getReceiverId();
+    public Long sendNotification(NotificationRequestDto notificationRequestDto, Long senderId, Long receiverId) {
+        User sender = userRepository.getReferenceById(senderId);
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new IllegalStateException("This receiver is null: " + receiverId));
+        Notification notification = new Notification(sender, receiver, notificationRequestDto.getContent(), notificationRequestDto.getType());
 
-        User sender = userRepository.getReferenceById(Long.valueOf(senderId));
-        User receiver = userRepository.getReferenceById(Long.valueOf(receiverId));
-        Notification notification = notificationRequestDto.toEntity(sender, receiver);
-
-        Map<String, SseEmitter> emitters = emitterRepository.findEmittersWithUserId(receiverId);
+        Map<String, SseEmitter> emitters = emitterRepository.findEmittersWithUserId(String.valueOf(receiverId));
         emitters.forEach(
                 (emitterId, emitter) -> {
                     emitterRepository.saveEventCache(emitterId, notification);
-                    sendMessage(emitter, receiverId, new NotificationResponseDto(notification));
+                    sendMessage(emitter, String.valueOf(receiverId), new NotificationResponseDto(notification));
                 }
         );
 
