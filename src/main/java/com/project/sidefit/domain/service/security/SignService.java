@@ -1,7 +1,9 @@
 package com.project.sidefit.domain.service.security;
 
 import com.project.sidefit.advice.exception.CEmailLoginFailedException;
+import com.project.sidefit.advice.exception.CRefreshTokenException;
 import com.project.sidefit.advice.exception.CTokenNotFound;
+import com.project.sidefit.advice.exception.CUserNotFoundException;
 import com.project.sidefit.config.security.JwtProvider;
 import com.project.sidefit.domain.entity.ConfirmationToken;
 import com.project.sidefit.domain.entity.RefreshToken;
@@ -76,7 +78,7 @@ public class SignService {
         
         // ~~~/uuid 형태
         // TODO EC2 ip 로 변경
-        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getId());
+        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
 
         mailService.sendMail(mailMessage);
     }
@@ -92,7 +94,7 @@ public class SignService {
         mailMessage.setTo(receiveEmail);
         mailMessage.setSubject("sidefit 회원가입 이메일 인증");
 
-        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getId());
+        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
         mailService.sendMail(mailMessage);
     }
 
@@ -154,8 +156,25 @@ public class SignService {
         return tokenDto;
     }
 
-    /*@Transactional
+    @Transactional
     public TokenDto reissue(String accessToken, String refreshToken) {
-        // 기존 refresh token 수정
-    }*/
+
+        if (!jwtProvider.validationToken(refreshToken)) {
+            throw new CRefreshTokenException();
+        }
+
+        String userPk = jwtProvider.getAuthentication(accessToken).getName();
+        User user = userJpaRepo.findById(Long.parseLong(userPk)).orElseThrow(CUserNotFoundException::new);
+
+        RefreshToken token = refreshTokenJpaRepo.findByKey(user.getId()).orElseThrow(CRefreshTokenException::new);
+
+        if (!token.getToken().equals(refreshToken)) {
+            throw new CRefreshTokenException();
+        }
+
+        TokenDto tokenDto = jwtProvider.createTokenDto(user.getId(), user.getRoles());
+        token.updateToken(tokenDto.getRefreshToken());
+
+        return tokenDto;
+    }
 }
