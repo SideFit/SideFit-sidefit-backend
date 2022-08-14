@@ -7,5 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface ConfirmationTokenJpaRepo extends JpaRepository<ConfirmationToken, String> {
-    Optional<ConfirmationToken> findByIdAndExpirationAfterAndExpired(String id, LocalDateTime now, boolean expired);
+    Optional<ConfirmationToken> findByTokenAndExpirationAfterAndExpired(String token, LocalDateTime now, boolean expired);
+
+    Optional<ConfirmationToken> findByEmail(String email);
 }

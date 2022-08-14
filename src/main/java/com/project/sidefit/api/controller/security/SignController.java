@@ -1,9 +1,9 @@
 package com.project.sidefit.api.controller.security;
 
+import com.project.sidefit.api.dto.jwt.TokenRequestDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
-import com.project.sidefit.domain.service.mail.MailService;
 import com.project.sidefit.domain.service.security.SignService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,6 +117,14 @@ public class SignController {
     /**
      * 이메일 재전송 api
      */
+    @PostMapping("/email/again")
+    public Response sendEmailAgain(@RequestBody EmailRequestDto emailRequestDto) {
+
+        // TODO 이미 이메일 인증처리 되었으면 다른 결과 보내고 프론트에서 처리
+
+        signService.sendAuthEmailAgain(emailRequestDto.getEmail());
+        return Response.success();
+    }
 
 
     /**
@@ -162,9 +170,9 @@ public class SignController {
     /**
      * Token 재발급 api
      */
-    /*@PostMapping("/reissue")
+    @PostMapping("/reissue")
     public Response reissue(@RequestBody TokenRequestDto tokenRequestDto) {
 
         return Response.success(signService.reissue(tokenRequestDto.getAccessToken(), tokenRequestDto.getRefreshToken()));
-    }*/
+    }
 }
