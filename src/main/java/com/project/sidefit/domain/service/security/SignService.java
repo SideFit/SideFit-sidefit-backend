@@ -75,7 +75,7 @@ public class SignService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(receiveEmail);
         mailMessage.setSubject("sidefit 회원가입 이메일 인증");
-        
+
         // ~~~/uuid 형태
         // TODO EC2 ip 로 변경
         mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
@@ -108,7 +108,7 @@ public class SignService {
 
         // 토큰 useToken() 처리
         confirmationToken.useToken();
-        
+
         // UserPrev 의 enable = true 로 변경
         // TODO orElseThrow() 에 예외 넣기
         UserPrev userPrev = userPrevJpaRepo.findByEmailAndEnable(confirmationToken.getEmail(), false).orElseThrow();
@@ -126,13 +126,13 @@ public class SignService {
 
         // TODO orElseThrow() 에 예외 넣기
         UserPrev userPrev = userPrevJpaRepo.findByEmailAndEnable(email, true).orElseThrow();
-        
+
         // 넘어온 데이터 + email이 일치하는 userPrev 조합으로 User 생성
         User user = User.createUser(email, userPrev.getPassword(), nickname, job);
-        
+
         // User 저장
         userJpaRepo.save(user);
-        
+
         // UserPrev 삭제
         userPrevJpaRepo.delete(userPrev);
     }

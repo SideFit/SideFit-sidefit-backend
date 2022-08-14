@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.security.SignService;
-import org.apache.tomcat.util.http.parser.MediaType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,10 +216,36 @@ public class RestDocsTest {
     }
 
     @Test
+    @DisplayName("Post /api/auth/email/again : 인증메일 재전송")
+    public void sendEmailAuthAgain() throws Exception {
+        //given
+        EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
+        willDoNothing().given(signService).sendAuthEmailAgain(anyString());
+
+        //when
+        ResultActions result = this.mockMvc.perform(post("/api/auth/email/again")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("re-send_email_auth",
+                        requestFields(
+                                fieldWithPath("email").type(STRING).description("이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("반환 데이터")
+                        )
+                ));
+    }
+
+    @Test
     @DisplayName("Get /api/auth/nickname/check : 닉네임 중복 체크")
     public void checkNicknameDuplicate() throws Exception {
-
-
         //given
         given(signService.validateDuplicatedNickname(anyString())).willReturn(false);
 
@@ -301,6 +326,49 @@ public class RestDocsTest {
                         requestFields(
                                 fieldWithPath("email").type(STRING).description("이메일"),
                                 fieldWithPath("password").type(STRING).description("비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data.grantType").type(STRING).description("Grant Type"),
+                                fieldWithPath("result.data.accessToken").type(STRING).description("access token"),
+                                fieldWithPath("result.data.refreshToken").type(STRING).description("refresh token"),
+                                fieldWithPath("result.data.accessTokenExpireDate").type(NUMBER).description("access token 만료시간")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("Post /api/auth/reissue : access token 재발급")
+    public void reissue() throws Exception {
+        //given
+        TokenDto response = TokenDto.builder().grantType("Bearer")
+                .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDI4Mzc0NCwiZXhwIjoxNjYwMjg3MzQ0fQ.oE64nKkVmFqRx0LgblAfMXvXDG9lU8sE57DG8heBeAU")
+                .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE0OTMzNDR9.UyY9pJtvBJnLXdlmp0Dk88LvAwFVlKg4-vHirAYxzvM")
+                .accessTokenExpireDate(3600000L).build();
+
+        given(signService.reissue(anyString(), anyString())).willReturn(response);
+
+        //when
+        TokenDto request = TokenDto.builder().grantType("Bearer")
+                .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDQxMTA5MiwiZXhwIjoxNjYwNDE0NjkyfQ.u1Bz9pEvDy68VJtr233x8E6z3Ua8e5ayhq8TlCc3DeI")
+                .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE2MjA2OTJ9.mG-udQ3mogvgP9ak3rnvU5sW8h3q4sntldz_FUhAIU4")
+                .accessTokenExpireDate(3600000L).build();
+
+        ResultActions result = this.mockMvc.perform(post("/api/auth/reissue")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("token_reissue",
+                        requestFields(
+                                fieldWithPath("grantType").type(STRING).description("Grant Type"),
+                                fieldWithPath("accessToken").type(STRING).description("access token"),
+                                fieldWithPath("refreshToken").type(STRING).description("refresh token"),
+                                fieldWithPath("accessTokenExpireDate").type(NUMBER).description("access token 만료 시간")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
