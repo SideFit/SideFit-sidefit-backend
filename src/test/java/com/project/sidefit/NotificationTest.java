@@ -112,7 +112,7 @@ public class NotificationTest {
 
         //then
         result.andExpect(status().isOk())
-                .andDo(document("send notification",
+                .andDo(document("send_notification",
                         requestParameters(
                                 parameterWithName("receiverId").description("수신자 id")
                         ),
@@ -163,7 +163,7 @@ public class NotificationTest {
 
         //then
         result.andExpect(status().isOk())
-                .andDo(document("get notifications",
+                .andDo(document("get_notifications",
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
                                 fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),

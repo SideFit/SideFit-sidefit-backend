@@ -73,6 +73,15 @@ include::{snippets}/email_auth_check/http-request.adoc[]
 include::{snippets}/email_auth_check/http-response.adoc[]
 include::{snippets}/email_auth_check/curl-request.adoc[]
 
+=== 인증메일 재전송
+RequestBody
+include::{snippets}/re-send_email_auth/request-fields.adoc[]
+ResponseBody
+include::{snippets}/send_email_auth/response-fields.adoc[]
+include::{snippets}/send_email_auth/http-request.adoc[]
+include::{snippets}/send_email_auth/http-response.adoc[]
+include::{snippets}/send_email_auth/curl-request.adoc[]
+
 === 닉네임 중복체크
 RequestBody
 include::{snippets}/check_nickname_duplicate/request-fields.adoc[]
@@ -100,15 +109,24 @@ include::{snippets}/email_login/http-request.adoc[]
 include::{snippets}/email_login/http-response.adoc[]
 include::{snippets}/email_login/curl-request.adoc[]
 
+=== access token 재발급
+RequestBody
+include::{snippets}/token_reissue/request-fields.adoc[]
+ResponseBody
+include::{snippets}/token_reissue/response-fields.adoc[]
+include::{snippets}/token_reissue/http-request.adoc[]
+include::{snippets}/token_reissue/http-response.adoc[]
+include::{snippets}/token_reissue/curl-request.adoc[]
+
 == notification
 === 알림 전송
 ==== Request
-include::{snippets}/send notification/request-fields.adoc[]
+include::{snippets}/send_notification/request-fields.adoc[]
 ==== Response
-include::{snippets}/send notification/response-fields.adoc[]
+include::{snippets}/send_notification/response-fields.adoc[]
 
 === 알림 조회
 ==== Request
-include::{snippets}/get notifications/request-parameters.adoc[]
+
 ==== Response
-include::{snippets}/get notifications/response-fields.adoc[]
+include::{snippets}/get_notifications/response-fields.adoc[]
