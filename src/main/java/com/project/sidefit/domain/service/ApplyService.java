@@ -133,6 +133,11 @@ public class ApplyService {
     }
 
     @Transactional(readOnly = true)
+    public ApplyResultDto findApplyResultDto(Long applyId) {
+        return new ApplyResultDto(findApply(applyId));
+    }
+
+    @Transactional(readOnly = true)
     public List<ApplyResponseDto> findApplyDtoList() {
         return applyRepository.findAll().stream()
                 .map(ApplyResponseDto::new)
