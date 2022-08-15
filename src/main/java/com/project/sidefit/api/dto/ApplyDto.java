@@ -57,4 +57,26 @@ public class ApplyDto {
             lastModifiedDate = apply.getLastModifiedDate();
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ApplyResultDto {
+
+        private Long id;
+        private Long userId;
+        private Long projectId;
+        private Integer status; // 0: 자신이 신청, 1: 팀장이 초대, 2: 수락, 3: 거절
+        private LocalDateTime createdDate;
+        private LocalDateTime lastModifiedDate;
+
+        public ApplyResultDto(Apply apply) {
+            id = apply.getId();
+            userId = apply.getUser().getId();
+            projectId = apply.getProject().getId();
+            status = apply.getStatus();
+            createdDate = apply.getCreatedDate();
+            lastModifiedDate = apply.getLastModifiedDate();
+        }
+    }
 }
