@@ -76,7 +76,6 @@ public class NotificationTest {
                 .contentType(MediaType.TEXT_EVENT_STREAM)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
                 .header("Last-Event-ID", "")
-                .param("userId", String.valueOf(user.getId()))
         );
 
         //then
@@ -95,19 +94,17 @@ public class NotificationTest {
         userRepository.save(sender);
         userRepository.save(receiver);
 
-        TokenDto token = signService.login("sender", "pw");
+        NotificationRequestDto notificationRequestDto = new NotificationRequestDto("test", NotificationType.CHAT);
 
-        String json = "{\n" +
-                " \"content\" : \"test\",\n" +
-                " \"type\" : \"CHAT\"\n" +
-                "}\n";
+        TokenDto token = signService.login("sender", "pw");
 
         //when
         ResultActions result = mockMvc.perform(post("/api/notification/send")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
-                .param("receiverId", "3")
-                .content(json)
+                .param("receiverId", String.valueOf(receiver.getId()))
+                .content(objectMapper.writeValueAsString(notificationRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
         );
 
         //then
