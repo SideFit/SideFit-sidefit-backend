@@ -118,15 +118,89 @@ include::{snippets}/token_reissue/http-request.adoc[]
 include::{snippets}/token_reissue/http-response.adoc[]
 include::{snippets}/token_reissue/curl-request.adoc[]
 
+== apply
+=== 유저 지원
+==== Request
+RequestParameters
+include::{snippets}/apply_to_project/request-parameters.adoc[]
+RequestBody
+include::{snippets}/apply_to_project/request-fields.adoc[]
+
+==== Response
+ResponseBody
+include::{snippets}/apply_to_project/response-fields.adoc[]
+
+include::{snippets}/apply_to_project/http-request.adoc[]
+include::{snippets}/apply_to_project/http-response.adoc[]
+include::{snippets}/apply_to_project/curl-request.adoc[]
+
+=== 팀장 초대
+==== Request
+RequestParameters
+include::{snippets}/invite_user/request-parameters.adoc[]
+RequestBody
+include::{snippets}/invite_user/request-fields.adoc[]
+
+==== Response
+ResponseBody
+include::{snippets}/invite_user/response-fields.adoc[]
+
+include::{snippets}/invite_user/http-request.adoc[]
+include::{snippets}/invite_user/http-response.adoc[]
+include::{snippets}/invite_user/curl-request.adoc[]
+
+=== 유저 지원 응답
+==== Request
+include::{snippets}/apply_response/path-parameters.adoc[]
+
+RequestParameters
+include::{snippets}/apply_response/request-parameters.adoc[]
+
+==== Response
+ResponseBody
+include::{snippets}/apply_response/response-fields.adoc[]
+
+include::{snippets}/apply_response/http-request.adoc[]
+include::{snippets}/apply_response/http-response.adoc[]
+include::{snippets}/apply_response/curl-request.adoc[]
+
+=== 팀장 초대 응답
+==== Request
+include::{snippets}/invite_response/path-parameters.adoc[]
+
+RequestParameters
+include::{snippets}/invite_response/request-parameters.adoc[]
+
+==== Response
+ResponseBody
+include::{snippets}/invite_response/response-fields.adoc[]
+
+include::{snippets}/invite_response/http-request.adoc[]
+include::{snippets}/invite_response/http-response.adoc[]
+include::{snippets}/invite_response/curl-request.adoc[]
+
 == notification
 === 알림 전송
 ==== Request
+RequestParameters
+include::{snippets}/send_notification/request-parameters.adoc[]
+
+RequestBody
 include::{snippets}/send_notification/request-fields.adoc[]
+
 ==== Response
+ResponseBody
 include::{snippets}/send_notification/response-fields.adoc[]
 
-=== 알림 조회
-==== Request
+include::{snippets}/send_notification/http-request.adoc[]
+include::{snippets}/send_notification/http-response.adoc[]
+include::{snippets}/send_notification/curl-request.adoc[]
 
+=== 알림 조회
 ==== Response
+ResponseBody
 include::{snippets}/get_notifications/response-fields.adoc[]
+
+include::{snippets}/get_notifications/http-request.adoc[]
+include::{snippets}/get_notifications/http-response.adoc[]
+include::{snippets}/get_notifications/curl-request.adoc[]
