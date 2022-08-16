@@ -27,21 +27,15 @@ public class ApplyApiController {
 
     @PostMapping("/project/apply")
     public Response apply(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestBody ApplyRequestDto ApplyRequestDto) {
-        if (user == null) {
-            return Response.failure(404, "인증된 사용자가 아닙니다.");
-        }
         Long applyId = applyService.applyToTeam(user.getId(), Long.valueOf(projectId), ApplyRequestDto);
         return Response.success(applyService.findApplyDto(applyId));
     }
 
     @PostMapping("/project/invite")
     public Response invite(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestParam String projectId, @RequestBody InviteRequestDto inviteRequestDto) {
-        if (user == null) {
-            return Response.failure(404, "인증된 사용자가 아닙니다.");
-        }
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
-            return Response.failure(404, "권한이 없습니다.");
+            return Response.failure(-1000, "프로젝트 관리 권한이 없습니다.");
         }
         Long applyId = applyService.inviteToUser(Long.valueOf(receiverId), Long.valueOf(projectId), inviteRequestDto);
         return Response.success(applyService.findApplyDto(applyId));
@@ -50,16 +44,13 @@ public class ApplyApiController {
     // 프로젝트 팀장이 유저 지원 처리
     @GetMapping("/project/apply-response/{applyId}")
     public Response getApplyResponse(@AuthenticationPrincipal User user, @PathVariable String applyId, @RequestParam Boolean flag) {
-        if (user == null) {
-            return Response.failure(404, "인증된 사용자가 아닙니다.");
-        }
         ApplyResponseDto apply = applyService.findApplyDto(Long.valueOf(applyId));
         ProjectResponseDto project = projectService.findProjectDto(apply.getProjectId());
         if (!project.getUserId().equals(user.getId())) {
-            return Response.failure(404, "권한이 없습니다.");
+            return Response.failure(-1000, "프로젝트 관리 권한이 없습니다.");
         }
         if (userRepository.findById(apply.getUserId()).isEmpty()) {
-            return Response.failure(404, "유저를 찾을 수 없습니다.");
+            return Response.failure(-1000, "유저를 찾을 수 없습니다.");
         }
         applyService.applyResponse(Long.valueOf(applyId), flag);
         return Response.success(applyService.findApplyResultDto(Long.valueOf(applyId)));
@@ -68,12 +59,9 @@ public class ApplyApiController {
     // 유저가 프로젝트 참여 제안 처리
     @GetMapping("/project/invite-response/{applyId}")
     public Response getInviteResponse(@AuthenticationPrincipal User user, @PathVariable String applyId, @RequestParam Boolean flag) {
-        if (user == null) {
-            return Response.failure(404, "인증된 사용자가 아닙니다.");
-        }
         ApplyResponseDto apply = applyService.findApplyDto(Long.valueOf(applyId));
         if (projectRepository.findById(apply.getProjectId()).isEmpty()) {
-            return Response.failure(404, "프로젝트가 존재하지 않습니다.");
+            return Response.failure(-1000, "프로젝트가 존재하지 않습니다.");
         }
         applyService.inviteResponse(Long.valueOf(applyId), flag);
         return Response.success(applyService.findApplyResultDto(Long.valueOf(applyId)));
