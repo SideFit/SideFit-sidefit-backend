@@ -16,7 +16,6 @@ public class RefreshToken {
 
     @Id
     @GeneratedValue
-    @Column(name = "refresh_token_id")
     private Long id;
 
     // TODO PK 로 할지 email 로 할지 >> 현재는 user pk
