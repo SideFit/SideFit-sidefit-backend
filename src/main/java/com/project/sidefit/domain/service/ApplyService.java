@@ -78,7 +78,7 @@ public class ApplyService {
     }
 
     // 프로젝트 팀장이 유저 지원 처리
-    public void applyRequest(Long applyId, boolean flag) {
+    public void applyResponse(Long applyId, boolean flag) {
         Apply apply = findApply(applyId);
         Long userId = apply.getUser().getId();
         User user = userRepository.findById(userId)
@@ -103,7 +103,7 @@ public class ApplyService {
     }
 
     // 유저가 프로젝트 참여 제안 처리
-    public void inviteRequest(Long applyId, boolean flag) {
+    public void inviteResponse(Long applyId, boolean flag) {
         Apply apply = findApply(applyId);
         Long projectId = apply.getProject().getId();
         Project project = projectRepository.findById(projectId)
@@ -130,6 +130,11 @@ public class ApplyService {
     @Transactional(readOnly = true)
     public ApplyResponseDto findApplyDto(Long applyId) {
         return new ApplyResponseDto(findApply(applyId));
+    }
+
+    @Transactional(readOnly = true)
+    public ApplyResultDto findApplyResultDto(Long applyId) {
+        return new ApplyResultDto(findApply(applyId));
     }
 
     @Transactional(readOnly = true)
