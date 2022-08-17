@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @SpringBootTest
-public class RestDocsTest {
+public class SignControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,27 +52,9 @@ public class RestDocsTest {
     @MockBean
     private CustomAccessDeniedHandler customAccessDeniedHandler;*/
 
-    @Test
-    @DisplayName("Get /api/healthcheck : healthcheck api")
-    public void healthcheck_테스트() throws Exception {
-
-
-        given(signService.validateDuplicatedEmail(any())).willReturn(false);
-
-        ResultActions result = this.mockMvc.perform(get("/api/healthcheck")
-                .accept(APPLICATION_JSON));
-
-        result.andExpect(status().isOk())
-                .andDo(document("healthcheck", responseFields(
-                                fieldWithPath("success").type(BOOLEAN).description("성공 유무"),
-                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
-                                fieldWithPath("result.data").type(STRING).description("healthcheck msg")
-                        ))
-                );
-    }
 
     @Test
-    @DisplayName("Get /api/auth/email/check : 이메일 중복 체크")
+    @DisplayName("이메일 중복 체크 : Get /api/auth/email/check")
     public void checkEmailDuplicate() throws Exception {
         //given
         given(signService.validateDuplicatedEmail(any(String.class))).willReturn(false);
@@ -103,7 +85,7 @@ public class RestDocsTest {
 
 
     @Test
-    @DisplayName("Post /api/auth/email/save : UserPrev 저장 성공")
+    @DisplayName("회원가입 1차 정보 저장 : Post /api/auth/email/save")
     public void userPrev() throws Exception {
         //given
         given(signService.validateDuplicatedEmail(any(String.class))).willReturn(false);
@@ -135,7 +117,7 @@ public class RestDocsTest {
 
 
     @Test
-    @DisplayName("Post /api/auth/email : 이메일에 인증링크 전송")
+    @DisplayName("이메일에 인증링크 전송 : Post /api/auth/email")
     public void send_email() throws Exception {
         //given
         willDoNothing().given(signService).sendAuthEmail(anyString());
@@ -163,7 +145,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Get /api/auth/confirm-email/{token} : 이메일 인증 처리")
+    @DisplayName("이메일 인증 처리 : Get /api/auth/confirm-email/{token}")
     public void confirmEmail() throws Exception {
         //given
         willDoNothing().given(signService).confirmEmail(anyString());
@@ -188,7 +170,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Get /api/auth/email/auth/check : 이메일 인증 체크")
+    @DisplayName("이메일 인증 체크 : Get /api/auth/email/auth/check")
     public void emailCheck() throws Exception {
         //given
         EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
@@ -216,7 +198,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Post /api/auth/email/again : 인증메일 재전송")
+    @DisplayName("인증메일 재전송 : Post /api/auth/email/again")
     public void sendEmailAuthAgain() throws Exception {
         //given
         EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
@@ -244,7 +226,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Get /api/auth/nickname/check : 닉네임 중복 체크")
+    @DisplayName("닉네임 중복 체크 : Get /api/auth/nickname/check")
     public void checkNicknameDuplicate() throws Exception {
         //given
         given(signService.validateDuplicatedNickname(anyString())).willReturn(false);
@@ -272,7 +254,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Post /api/auth/join : 이메일 회원가입")
+    @DisplayName("이메일 회원가입 : Post /api/auth/join")
     public void email_join() throws Exception {
         //given
         willDoNothing().given(signService).join(anyString(), anyString(), anyString());
@@ -302,7 +284,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Post /api/auth/login : 이메일 login")
+    @DisplayName("이메일 login : Post /api/auth/login")
     public void email_login() throws Exception {
         //given
         TokenDto response = TokenDto.builder().grantType("Bearer")
@@ -339,7 +321,7 @@ public class RestDocsTest {
     }
 
     @Test
-    @DisplayName("Post /api/auth/reissue : access token 재발급")
+    @DisplayName("access token 재발급 : Post /api/auth/reissue")
     public void reissue() throws Exception {
         //given
         TokenDto response = TokenDto.builder().grantType("Bearer")

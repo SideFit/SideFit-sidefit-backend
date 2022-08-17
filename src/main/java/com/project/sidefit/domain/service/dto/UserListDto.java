@@ -19,14 +19,14 @@ public class UserListDto {
     private String nickname;
     private String job;
     private String introduction;
-    private List<String> tag;
+    private List<String> tags;
 
     public UserListDto(User user){
         id = user.getId();
         nickname = user.getNickname();
         job = user.getJob();
         introduction = user.getIntroduction();
-        tag = user.getTags().stream()
+        tags = user.getTags().stream()
                 .map(tag -> tag.getName()).collect(Collectors.toList());
     }
 }

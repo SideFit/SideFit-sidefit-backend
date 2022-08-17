@@ -16,10 +16,4 @@ public class HealthcheckController {
 
         return Response.success("service is health");
     }
-
-    // 로그인 동작하는지 확인용 컨트롤러
-    @GetMapping("/login/check")
-    public Response loginCheck() {
-        return Response.success("로그인 연결 동작 성공");
-    }
 }
