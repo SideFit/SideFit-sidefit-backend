@@ -16,7 +16,7 @@ public class Favorite {
     @GeneratedValue
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 100)
     private String field;
 
     public Favorite(String field) {

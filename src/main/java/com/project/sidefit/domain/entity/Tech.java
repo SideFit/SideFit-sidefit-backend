@@ -16,7 +16,7 @@ public class Tech {
     @GeneratedValue
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 100)
     private String stack;
 
     public Tech(String stack) {

@@ -71,8 +71,9 @@ public class User extends BaseTime implements UserDetails {
     @JoinColumn(name = "user_id")
     private List<Tech> teches = new ArrayList<>();
 
-    // mbti?
+    // mbti
     @Enumerated(EnumType.STRING)
+    @Column(length = 10)
     private Mbti mbti;
 
     public static User createUser(String email, String password, String nickname, String job) {

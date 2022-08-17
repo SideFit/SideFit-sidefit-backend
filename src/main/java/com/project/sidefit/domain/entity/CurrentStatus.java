@@ -16,7 +16,7 @@ public class CurrentStatus {
     @GeneratedValue
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 100)
     private String status;
 
     public CurrentStatus(String status) {
