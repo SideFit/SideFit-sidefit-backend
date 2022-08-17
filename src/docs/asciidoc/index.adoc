@@ -27,7 +27,7 @@ include::{snippets}/healthcheck/http-request.adoc[]
 Response:
 include::{snippets}/healthcheck/http-response.adoc[]
 
-== User
+== Sign, Login
 === email 중복체크
 RequestBody
 include::{snippets}/check_email_duplicate/request-fields.adoc[]
@@ -117,6 +117,27 @@ include::{snippets}/token_reissue/response-fields.adoc[]
 include::{snippets}/token_reissue/http-request.adoc[]
 include::{snippets}/token_reissue/http-response.adoc[]
 include::{snippets}/token_reissue/curl-request.adoc[]
+
+== User
+=== 전체 회원목록 조회
+ResponseBody
+include::{snippets}/get_users/response-fields.adoc[]
+include::{snippets}/get_users/http-request.adoc[]
+include::{snippets}/get_users/http-response.adoc[]
+include::{snippets}/get_users/curl-request.adoc[]
+
+=== 회원 상세조회
+RequestBody
+
+include::{snippets}/get_user_detail/path-parameters.adoc[]
+
+ResponseBody
+
+include::{snippets}/get_user_detail/response-fields.adoc[]
+include::{snippets}/get_user_detail/http-request.adoc[]
+include::{snippets}/get_user_detail/http-response.adoc[]
+include::{snippets}/get_user_detail/curl-request.adoc[]
+
 
 == apply
 === 유저 지원
