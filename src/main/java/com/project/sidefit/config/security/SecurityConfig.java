@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/docs/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/**").permitAll() // 테스트 용
                 .antMatchers(HttpMethod.GET, "/api/healthcheck").permitAll()
                 .anyRequest().hasRole("USER")
 
