@@ -1,26 +1,23 @@
 package com.project.sidefit.domain.service.security;
 
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.advice.exception.CUserNotFoundException;
+import com.project.sidefit.domain.repository.UserJpaRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private final UserJpaRepo userJpaRepo;
+
     @Override
     public UserDetails loadUserByUsername(String userPk) throws UsernameNotFoundException {
-        // 엔티티 조회로 변경
 
-        List<String> roles = new ArrayList<>();
-        roles.add("ROLE_USER");
-
-        return User.createUser(Long.parseLong(userPk), "test@gmail.com", "test1234", roles);
+        return userJpaRepo.findById(Long.parseLong(userPk)).orElseThrow(CUserNotFoundException::new);
     }
 }

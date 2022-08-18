@@ -1,44 +1,50 @@
 package com.project.sidefit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.sidefit.domain.service.security.SignService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@SpringBootTest
 @AutoConfigureRestDocs
-public class RestDocsTest {
+@SpringBootTest
+public class HealthcheckControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-//    @MockBean
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("RestDocs 테스트")
+    @DisplayName("Get /api/healthcheck : healthcheck api")
     public void healthcheck_테스트() throws Exception {
 
-        ResultActions result = this.mockMvc.perform(get("/sidefit/healthcheck")
-                .accept(MediaType.APPLICATION_JSON));
+        ResultActions result = this.mockMvc.perform(get("/api/healthcheck")
+                .accept(APPLICATION_JSON));
 
         result.andExpect(status().isOk())
                 .andDo(document("healthcheck", responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 유무"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("상태 코드"),
-                                fieldWithPath("result.data").type(JsonFieldType.STRING).description("healthcheck msg")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 유무"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data").type(STRING).description("healthcheck msg")
                         ))
                 );
     }

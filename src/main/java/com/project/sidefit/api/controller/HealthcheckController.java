@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/sidefit")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class HealthcheckController {
 
@@ -16,5 +16,4 @@ public class HealthcheckController {
 
         return Response.success("service is health");
     }
-
 }
