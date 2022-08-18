@@ -2,16 +2,17 @@ package com.project.sidefit.domain.service;
 
 import com.project.sidefit.domain.entity.*;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.ProjectUserRepository;
 import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
+import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.project.sidefit.api.dto.ImageDto.*;
 import static com.project.sidefit.api.dto.ProjectDto.*;
 
 @Service
@@ -24,19 +25,23 @@ public class ProjectService {
     private final UserJpaRepo userRepository;
     private final ImageRepository imageRepository;
 
-    public Long makeProject(Long userId, ProjectRequestDto projectRequestDto) {
+    public Long makeProject(Long userId, Long imageId, ProjectRequestDto projectRequestDto, ImageRequestDto imageRequestDto) {
         User user = userRepository.getReferenceById(userId);
-        Image image = updateImage(projectRequestDto);
+        Image image = selectOrSaveImage(imageId, imageRequestDto);
         Project project = createProject(projectRequestDto, user, image);
         ProjectUser projectUser = ProjectUser.createProjectUser(user, project);
-        projectUserRepository.save(projectUser);
 
+        projectUserRepository.save(projectUser);
         return projectRepository.save(project).getId();
     }
 
-    public void updateProject(Long projectId, ProjectRequestDto projectRequestDto) {
+    // TODO: 어떤 필드를 수정하는지?
+    public void updateProject(Long projectId, Long imageId, ProjectRequestDto projectRequestDto, ImageRequestDto imageRequestDto) {
         Project project = findProject(projectId);
-        Image image = updateImage(projectRequestDto);
+        if (!project.isStatus()) {
+            throw new IllegalStateException("이미 종료된 프로젝트입니다.");
+        }
+        Image image = selectOrSaveImage(imageId, imageRequestDto);
         project.update(image,
                 projectRequestDto.getTitle(),
                 projectRequestDto.getType(),
@@ -49,13 +54,63 @@ public class ProjectService {
         );
     }
 
-    public void deleteProject(Long projectId) {
+    public void endProject(Long projectId) {
+        Project project = findProject(projectId);
+        project.end();
+    }
 
+    // TODO: projectId 를 FK 로 가지고 있는 엔티티 처리
+    public void deleteProject(Long projectId) {
+        projectRepository.delete(findProject(projectId));
     }
 
     @Transactional(readOnly = true)
-    public ProjectResponseDto findProjectDto(Long teamId) {
-        return new ProjectResponseDto(findProject(teamId));
+    public List<MemberResponseDto> findProjectUserDtoListWithProjectId(Long projectId) {
+        Project project = findProject(projectId);
+        List<User> members = project.getProjectUsers().stream()
+                .map(ProjectUser::getUser)
+                .collect(Collectors.toList());
+
+        return members.stream()
+                .map(MemberResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberResponseDto> findPreMemberDtoListWithUserId(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        List<ProjectUser> projectUserList = projectUserRepository.findByUser(user);
+        List<Long> projectIds = projectUserList.stream()
+                .map(projectUser -> projectUser.getProject().getId())
+                .collect(Collectors.toList());
+
+        return projectUserRepository.findPreMembers(projectIds);
+    }
+
+    // TODO: 점수 정렬 기준 수정
+    @Transactional(readOnly = true)
+    public List<ProjectRecommendDto> findRecommendProjectDtoListWithUserId(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        List<Project> projects = projectRepository.findAll();
+
+        // key: project, value: score
+        Map<Project, Integer> scoreMap = new HashMap<>();
+        for (Project project : projects) {
+            int score = project.recommendScoreByUser(user);
+            scoreMap.put(project, score);
+        }
+        // 각각 합산한 점수들을 내림차순으로 나열
+        List<Map.Entry<Project, Integer>> scoreMapEntry = new ArrayList<>(scoreMap.entrySet());
+        scoreMapEntry.sort(Comparator.comparingInt(Map.Entry::getValue));
+
+        return scoreMapEntry.stream()
+                .map(entry -> new ProjectRecommendDto(entry.getKey()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectResponseDto findProjectDto(Long projectId) {
+        return new ProjectResponseDto(findProject(projectId));
     }
 
     @Transactional(readOnly = true)
@@ -66,9 +121,9 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    private Project findProject(Long teamId) {
-        return projectRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalStateException("This team is null: " + teamId));
+    private Project findProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalStateException("This team is null: " + projectId));
     }
 
     private Project createProject(ProjectRequestDto projectRequestDto, User user, Image image) {
@@ -83,13 +138,21 @@ public class ProjectService {
                 .stack(projectRequestDto.getStack())
                 .meetingPlan(projectRequestDto.getMeetingPlan())
                 .hashtag(projectRequestDto.getHashtag())
+                .status(true)
                 .build();
     }
 
-    private Image updateImage(ProjectRequestDto projectRequestDto) {
-        Image image = null;
-        if (projectRequestDto.getImageId() != null) {
-            image = imageRepository.getReferenceById(Long.valueOf(projectRequestDto.getImageId()));
+    /**
+     * 기본 이미지 선택 시 : imageRepository 에서 가져옴
+     * 새 이미지 선택 시 : 새 객체 생성 후 저장
+     */
+    private Image selectOrSaveImage(Long imageId, ImageRequestDto imageRequestDto) {
+        Image image;
+        if (imageRequestDto.getImageUrl().isEmpty()) {
+            image = imageRepository.getReferenceById(imageId);
+        } else {
+            image = new Image(imageRequestDto.getName(), imageRequestDto.getImageUrl());
+            imageRepository.save(image);
         }
         return image;
     }
