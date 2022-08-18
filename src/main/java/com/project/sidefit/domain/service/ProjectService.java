@@ -35,9 +35,13 @@ public class ProjectService {
         return projectRepository.save(project).getId();
     }
 
-    public void updateProject(Long projectId, ProjectRequestDto projectRequestDto) {
+    // TODO: 어떤 필드를 수정하는지?
+    public void updateProject(Long projectId, Long imageId, ProjectRequestDto projectRequestDto, ImageRequestDto imageRequestDto) {
         Project project = findProject(projectId);
-        Image image = updateImage(projectRequestDto);
+        if (!project.isStatus()) {
+            throw new IllegalStateException("이미 종료된 프로젝트입니다.");
+        }
+        Image image = selectOrSaveImage(imageId, imageRequestDto);
         project.update(image,
                 projectRequestDto.getTitle(),
                 projectRequestDto.getType(),
