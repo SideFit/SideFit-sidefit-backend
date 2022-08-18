@@ -1,6 +1,8 @@
 package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.sidefit.api.dto.PasswordRequestDto;
+import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.domain.entity.Mbti;
 import com.project.sidefit.domain.service.UserService;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
@@ -22,15 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -114,6 +118,62 @@ public class UserControllerTest {
                                 fieldWithPath("result.data.favorites").type(ARRAY).description("좋아하는 분야"),
                                 fieldWithPath("result.data.teches").type(ARRAY).description("기술 스택"),
                                 fieldWithPath("result.data.tags").type(ARRAY).description("태그")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경을 위한 링크를 메일에 전송 : Post /api/user/password/email")
+    public void sendPasswordEmail() throws Exception {
+        //given
+        EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
+        willDoNothing().given(userService).sendPasswordEmail(anyString());
+
+        //when
+        ResultActions result = this.mockMvc.perform(post("/api/user/password/email")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("send_password_email",
+                        requestFields(
+                                fieldWithPath("email").type(STRING).description("이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("반환 데이터")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경처리 : Patch /api/user/password/{token}")
+    public void updatePassword() throws Exception {
+        //given
+        PasswordRequestDto request = PasswordRequestDto.builder().password("test123password").passwordCheck("test123password").build();
+        willDoNothing().given(userService).updatePassword(anyString(), anyString());
+
+        //when
+        ResultActions result = this.mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/user/password/{token}", "5b52fe61-6a3f-4910-9cb8-186e0ac65053")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("change_password",
+                        pathParameters(
+                                parameterWithName("token").description("이메일 인증 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("반환 데이터")
                         )
                 ));
     }
