@@ -9,9 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.project.sidefit.api.dto.ImageDto.*;
 import static com.project.sidefit.api.dto.ProjectDto.*;
 
 @Service
@@ -24,13 +25,13 @@ public class ProjectService {
     private final UserJpaRepo userRepository;
     private final ImageRepository imageRepository;
 
-    public Long makeProject(Long userId, ProjectRequestDto projectRequestDto) {
+    public Long makeProject(Long userId, Long imageId, ProjectRequestDto projectRequestDto, ImageRequestDto imageRequestDto) {
         User user = userRepository.getReferenceById(userId);
-        Image image = updateImage(projectRequestDto);
+        Image image = selectOrSaveImage(imageId, imageRequestDto);
         Project project = createProject(projectRequestDto, user, image);
         ProjectUser projectUser = ProjectUser.createProjectUser(user, project);
-        projectUserRepository.save(projectUser);
 
+        projectUserRepository.save(projectUser);
         return projectRepository.save(project).getId();
     }
 
@@ -66,9 +67,9 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    private Project findProject(Long teamId) {
-        return projectRepository.findById(teamId)
-                .orElseThrow(() -> new IllegalStateException("This team is null: " + teamId));
+    private Project findProject(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalStateException("This team is null: " + projectId));
     }
 
     private Project createProject(ProjectRequestDto projectRequestDto, User user, Image image) {
@@ -86,10 +87,17 @@ public class ProjectService {
                 .build();
     }
 
-    private Image updateImage(ProjectRequestDto projectRequestDto) {
-        Image image = null;
-        if (projectRequestDto.getImageId() != null) {
-            image = imageRepository.getReferenceById(Long.valueOf(projectRequestDto.getImageId()));
+    /**
+     * 기본 이미지 선택 시 : imageRepository 에서 가져옴
+     * 새 이미지 선택 시 : 새 객체 생성 후 저장
+     */
+    private Image selectOrSaveImage(Long imageId, ImageRequestDto imageRequestDto) {
+        Image image;
+        if (imageRequestDto.getImageUrl().isEmpty()) {
+            image = imageRepository.getReferenceById(imageId);
+        } else {
+            image = new Image(imageRequestDto.getName(), imageRequestDto.getImageUrl());
+            imageRepository.save(image);
         }
         return image;
     }
