@@ -18,7 +18,6 @@ public class UserPrev {
 
     @Id
     @GeneratedValue
-    @Column(name = "user_prev_id")
     private Long id;
     private String email;
     private String password;

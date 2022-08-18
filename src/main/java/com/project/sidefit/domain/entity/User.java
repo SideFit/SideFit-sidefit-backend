@@ -21,7 +21,6 @@ public class User extends BaseTime implements UserDetails {
 
     @Id
     @GeneratedValue
-    @Column(name = "user_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -35,6 +34,7 @@ public class User extends BaseTime implements UserDetails {
     private String password;
 
     // not null
+    // TODO Role enum 단일값? or RoleType 엔티티 List?
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "roles",
@@ -52,19 +52,29 @@ public class User extends BaseTime implements UserDetails {
     private String introduction;
 
     // 태그 >> #으로 여러개 작성 >> #구분자로 사용하면 될지?
-    private String tag;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Tag> tags = new ArrayList<>();
 
     // 관심분야 >> 다중 선택
-    private String favorite;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Favorite> favorites = new ArrayList<>();
 
     // 현재상태 >> 다중 선택
-    private String status;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<CurrentStatus> currentStatuses = new ArrayList<>();
 
     // 기술스택 >> 다중 선택
-    private String stack;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Tech> teches = new ArrayList<>();
 
-    // mbti?
-    private String mbti;
+    // mbti
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Mbti mbti;
 
     public static User createUser(String email, String password, String nickname, String job) {
         User user = new User();
@@ -76,6 +86,10 @@ public class User extends BaseTime implements UserDetails {
         user.roles.add("ROLE_USER");
 
         return user;
+    }
+
+    public void updateMbti(Mbti mbti) {
+        this.mbti = mbti;
     }
 
     public void updateImage(Image image) {

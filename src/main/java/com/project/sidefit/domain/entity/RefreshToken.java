@@ -12,15 +12,14 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken {
+public class RefreshToken extends BaseTime {
 
     @Id
     @GeneratedValue
-    @Column(name = "refresh_token_id")
     private Long id;
 
     // TODO PK 로 할지 email 로 할지 >> 현재는 user pk
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long key;
 
     @Column(nullable = false)

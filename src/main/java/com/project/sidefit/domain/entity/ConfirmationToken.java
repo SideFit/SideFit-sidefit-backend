@@ -21,7 +21,6 @@ public class ConfirmationToken extends BaseTime {
     // UUID
     @Id
     @GeneratedValue
-    @Column(name = "confirmation_token_id")
     private Long id;
 
     private String token;
