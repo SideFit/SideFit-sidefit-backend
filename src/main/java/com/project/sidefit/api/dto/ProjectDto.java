@@ -71,6 +71,43 @@ public class ProjectDto {
             hashtag = project.getHashtag();
             createdDate = project.getCreatedDate();
             lastModifiedDate = project.getLastModifiedDate();
+            projectUsers = project.getProjectUsers().stream()
+                    .map(ProjectUserResponseDto::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProjectUserResponseDto {
+
+        private Long id;
+        private Long userId;
+        private Long projectId;
+
+        public ProjectUserResponseDto(ProjectUser projectUser) {
+            id = projectUser.getId();
+            userId = projectUser.getUser().getId();
+            projectId = projectUser.getProject().getId();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberResponseDto {
+
+        private Long id;
+        private Long imageId;
+        private String nickname;
+        private String job;
+
+        public MemberResponseDto(User user) {
+            id = user.getId();
+            imageId = user.getImage().getId();
+            nickname = user.getNickname();
+            job = user.getJob();
         }
     }
 
