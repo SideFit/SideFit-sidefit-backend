@@ -50,11 +50,13 @@ public class Project extends BaseTime {
     @Column(length = 10)
     private String meetingPlan;
 
-    @Column(length = 100)
-    private String hashtag; // # 태그 입력
+    @Column(length = 300)
+    private String hashtag; // 해시 태그 (# 태그 입력)
+
+    private boolean status; // 현재 진행 여부 (true: 진행중, false: 종료)
 
     @Builder
-    private Project(User user, Image image, String title, int type, String field, String introduction, String period, String stack, String meetingPlan, String hashtag) {
+    private Project(User user, Image image, String title, int type, String field, String introduction, String period, String stack, String meetingPlan, String hashtag, boolean status) {
         this.user = user;
         this.image = image;
         this.title = title;
@@ -65,6 +67,7 @@ public class Project extends BaseTime {
         this.stack = stack;
         this.meetingPlan = meetingPlan;
         this.hashtag = hashtag;
+        this.status = status;
     }
 
     public void update(Image image, String title, int type, String field, String introduction, String period, String stack, String meetingPlan, String hashtag) {
