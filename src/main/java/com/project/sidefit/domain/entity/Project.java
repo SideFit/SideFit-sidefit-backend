@@ -81,4 +81,27 @@ public class Project extends BaseTime {
         this.meetingPlan = meetingPlan;
         this.hashtag = hashtag;
     }
+
+    // TODO: User column 에 맞게 수정, 각 column 의 입력 방식에 따라 수정
+    public int recommendScoreByUser(User user) {
+        int score = 0;
+        if (user.getFavorite().equals(field)) {
+            score += 5;
+        }
+        if (user.getStack().equals(stack)) {
+            score += 3;
+        }
+        if (user.getStatus().equals(type)) {
+            score += 2;
+        }
+        return score;
+    }
+
+    public void end() {
+        if (status) {
+            status = false;
+        } else {
+            throw new IllegalStateException("이미 종료된 프로젝트입니다.");
+        }
+    }
 }
