@@ -23,6 +23,7 @@ public class ConfirmationToken extends BaseTime {
     @GeneratedValue
     private Long id;
 
+    // UUID
     private String token;
 
     private boolean expired;
