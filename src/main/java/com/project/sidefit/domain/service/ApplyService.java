@@ -36,6 +36,12 @@ public class ApplyService {
         User user = userRepository.getReferenceById(userId);
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalStateException("This project is null: " + projectId));
+        if (applyRepository.findByUser(user).stream().anyMatch(apply -> apply.getProject().equals(project) && apply.getStatus() == 0)) {
+            throw new IllegalStateException("이미 지원하신 프로젝트입니다. 잠시만 기다려주세요.");
+        }
+        if (project.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("자신의 프로젝트에는 지원하실 수 없습니다.");
+        }
         Apply apply = Apply.builder()
                 .user(user)
                 .project(project)
@@ -59,6 +65,9 @@ public class ApplyService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("This user is null: " + userId));
         Project project = projectRepository.getReferenceById(projectId);
+        if (applyRepository.findByProject(project).stream().anyMatch(apply -> apply.getUser().equals(user) && apply.getStatus() == 1)) {
+            throw new IllegalStateException("이미 참여를 요청하신 유저입니다. 잠시만 기다려주세요.");
+        }
         Apply apply = Apply.builder()
                 .user(user)
                 .project(project)
