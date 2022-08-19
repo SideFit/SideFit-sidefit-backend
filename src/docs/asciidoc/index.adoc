@@ -138,6 +138,24 @@ include::{snippets}/get_user_detail/http-request.adoc[]
 include::{snippets}/get_user_detail/http-response.adoc[]
 include::{snippets}/get_user_detail/curl-request.adoc[]
 
+=== 비밀번호 변경 email 전송
+RequestBody
+include::{snippets}/send_password_email/request-fields.adoc[]
+ResponseBody
+include::{snippets}/send_password_email/response-fields.adoc[]
+include::{snippets}/send_password_email/http-request.adoc[]
+include::{snippets}/send_password_email/http-response.adoc[]
+include::{snippets}/send_password_email/curl-request.adoc[]
+
+=== 비밀번호 변경처리
+RequestBody
+include::{snippets}/change_password/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/change_password/response-fields.adoc[]
+include::{snippets}/change_password/http-request.adoc[]
+include::{snippets}/change_password/http-response.adoc[]
+include::{snippets}/change_password/curl-request.adoc[]
+
 
 == apply
 === 유저 지원

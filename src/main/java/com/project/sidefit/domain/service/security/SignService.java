@@ -109,6 +109,8 @@ public class SignService {
         // 토큰 useToken() 처리
         confirmationToken.useToken();
 
+        // TODO 토큰 삭제처리?
+
         // UserPrev 의 enable = true 로 변경
         // TODO orElseThrow() 에 예외 넣기
         UserPrev userPrev = userPrevJpaRepo.findByEmailAndEnable(confirmationToken.getEmail(), false).orElseThrow();

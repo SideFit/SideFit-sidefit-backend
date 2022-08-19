@@ -96,6 +96,10 @@ public class User extends BaseTime implements UserDetails {
         this.image = image;
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles
