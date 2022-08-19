@@ -157,6 +157,71 @@ include::{snippets}/change_password/http-response.adoc[]
 include::{snippets}/change_password/curl-request.adoc[]
 
 
+== project
+=== 프로젝트 조회
+PathParameters
+
+include::{snippets}/get_project/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/get_project/response-fields.adoc[]
+
+include::{snippets}/get_project/http-request.adoc[]
+include::{snippets}/get_project/http-response.adoc[]
+include::{snippets}/get_project/curl-request.adoc[]
+
+=== 프로젝트 생성
+RequestParameters
+include::{snippets}/create_project/request-parameters.adoc[]
+RequestBody
+include::{snippets}/create_project/request-fields.adoc[]
+ResponseBody
+include::{snippets}/create_project/response-fields.adoc[]
+
+include::{snippets}/create_project/http-request.adoc[]
+include::{snippets}/create_project/http-response.adoc[]
+include::{snippets}/create_project/curl-request.adoc[]
+
+=== 프로젝트 수정
+
+
+=== 프로젝트 삭제
+RequestParameters
+include::{snippets}/delete_project/request-parameters.adoc[]
+ResponseBody
+include::{snippets}/delete_project/response-fields.adoc[]
+
+include::{snippets}/delete_project/http-request.adoc[]
+include::{snippets}/delete_project/http-response.adoc[]
+include::{snippets}/delete_project/curl-request.adoc[]
+
+=== 프로젝트 멤버 조회
+PathParameters
+
+include::{snippets}/get_project_members/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/get_project_members/response-fields.adoc[]
+
+include::{snippets}/get_project_members/http-request.adoc[]
+include::{snippets}/get_project_members/http-response.adoc[]
+include::{snippets}/get_project_members/curl-request.adoc[]
+
+=== 프로젝트 이전 멤버 조회
+ResponseBody
+include::{snippets}/get_project_pre_members/response-fields.adoc[]
+
+include::{snippets}/get_project_pre_members/http-request.adoc[]
+include::{snippets}/get_project_pre_members/http-response.adoc[]
+include::{snippets}/get_project_pre_members/curl-request.adoc[]
+
+=== 추천 프로젝트
+ResponseBody
+include::{snippets}/get_project_recommend_list/response-fields.adoc[]
+
+include::{snippets}/get_project_recommend_list/http-request.adoc[]
+include::{snippets}/get_project_recommend_list/http-response.adoc[]
+include::{snippets}/get_project_recommend_list/curl-request.adoc[]
+
+
 == apply
 === 유저 지원
 RequestParameters
@@ -183,6 +248,8 @@ include::{snippets}/invite_user/http-response.adoc[]
 include::{snippets}/invite_user/curl-request.adoc[]
 
 === 유저 지원 응답
+PathParameters
+
 include::{snippets}/apply_response/path-parameters.adoc[]
 RequestParameters
 include::{snippets}/apply_response/request-parameters.adoc[]
@@ -194,6 +261,8 @@ include::{snippets}/apply_response/http-response.adoc[]
 include::{snippets}/apply_response/curl-request.adoc[]
 
 === 팀장 초대 응답
+PathParameters
+
 include::{snippets}/invite_response/path-parameters.adoc[]
 RequestParameters
 include::{snippets}/invite_response/request-parameters.adoc[]
@@ -203,6 +272,7 @@ include::{snippets}/invite_response/response-fields.adoc[]
 include::{snippets}/invite_response/http-request.adoc[]
 include::{snippets}/invite_response/http-response.adoc[]
 include::{snippets}/invite_response/curl-request.adoc[]
+
 
 == notification
 === 알림 전송
