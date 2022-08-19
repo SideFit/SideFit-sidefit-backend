@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -28,6 +29,9 @@ public class Project extends BaseTime {
 
     @OneToMany(mappedBy = "project", orphanRemoval = true)
     private List<ProjectUser> projectUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    private List<Recruit> recruits = new ArrayList<>();
 
     @Column(length = 20, unique = true)
     private String title; // 프로젝트 제목
