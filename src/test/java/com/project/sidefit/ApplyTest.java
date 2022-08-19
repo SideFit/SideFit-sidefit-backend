@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.project.sidefit.api.dto.ApplyDto.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -103,16 +104,9 @@ public class ApplyTest {
                                 fieldWithPath("comment").type(JsonFieldType.STRING).description("한마디")
                         ),
                         responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("result.data.id").type(JsonFieldType.NUMBER).description("지원 id"),
-                                fieldWithPath("result.data.userId").type(JsonFieldType.NUMBER).description("유저 id"),
-                                fieldWithPath("result.data.projectId").type(JsonFieldType.NUMBER).description("프로젝트 id"),
-                                fieldWithPath("result.data.jobGroup").type(JsonFieldType.STRING).description("직군"),
-                                fieldWithPath("result.data.comment").type(JsonFieldType.STRING).description("한마디"),
-                                fieldWithPath("result.data.status").type(JsonFieldType.NUMBER).description("지원 상태"),
-                                fieldWithPath("result.data.createdDate").type(JsonFieldType.STRING).description("생성 일자"),
-                                fieldWithPath("result.data.lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("결과 메시지")
                         )
                 ));
     }
@@ -158,16 +152,9 @@ public class ApplyTest {
                                 fieldWithPath("jobGroup").type(JsonFieldType.STRING).description("직군")
                         ),
                         responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("result.data.id").type(JsonFieldType.NUMBER).description("초대 id"),
-                                fieldWithPath("result.data.userId").type(JsonFieldType.NUMBER).description("유저 id"),
-                                fieldWithPath("result.data.projectId").type(JsonFieldType.NUMBER).description("프로젝트 id"),
-                                fieldWithPath("result.data.jobGroup").type(JsonFieldType.STRING).description("직군"),
-                                fieldWithPath("result.data.comment").type(JsonFieldType.NULL).description("한마디"),
-                                fieldWithPath("result.data.status").type(JsonFieldType.NUMBER).description("초대 상태"),
-                                fieldWithPath("result.data.createdDate").type(JsonFieldType.STRING).description("생성 일자"),
-                                fieldWithPath("result.data.lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("결과 메시지")
                         )
                 ));
     }

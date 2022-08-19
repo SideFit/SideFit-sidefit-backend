@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.project.sidefit.api.dto.ImageDto.*;
 import static com.project.sidefit.api.dto.ProjectDto.*;
 
 @RestController
@@ -23,56 +22,47 @@ public class ProjectApiController {
 
     @GetMapping("/project/{projectId}")
     public Response getProject(@PathVariable String projectId) {
-        if (projectRepository.findById(Long.valueOf(projectId)).isEmpty()) {
-            return Response.failure(-1000, "프로젝트를 찾을 수 없습니다.");
-        }
         return Response.success(projectService.findProjectDto(Long.valueOf(projectId)));
     }
 
-    // TODO
-    @GetMapping("/project/sample-image/list")
-    public Response getSampleImage() {
+    @PostMapping("/project")
+    public Response createProject(@AuthenticationPrincipal User user, @RequestParam(required = false) String imageId, @RequestBody ProjectRequestDto projectRequestDto) {
+        if (imageId.isEmpty() && projectRequestDto.getImageUrl().isEmpty()) {
+            return Response.failure(-1000, "이미지를 선택해주세요.");
+        }
+        Long projectId = projectService.makeProject(user.getId(), Long.valueOf(imageId), projectRequestDto);
         return Response.success();
     }
 
-    @PostMapping("/project")
-    public Response createProject(@AuthenticationPrincipal User user, @RequestParam(required = false) String imageId, @RequestBody ProjectRequestDto projectRequestDto,
-                                  @RequestBody ImageRequestDto imageRequestDto) {
-        if (imageId.isEmpty() && imageRequestDto.getImageUrl().isEmpty()) {
-            return Response.failure(-1000, "이미지를 선택해주세요.");
-        }
-        Long projectId = projectService.makeProject(user.getId(), Long.valueOf(imageId), projectRequestDto, imageRequestDto);
-        return Response.success(projectService.findProjectDto(projectId));
-    }
-
+    // TODO: 어떤 필드를 업데이트 할 수 있는지?
     @PatchMapping("/project")
     public Response updateProject(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestParam(required = false) String imageId,
-                                  @RequestBody ProjectRequestDto projectRequestDto, @RequestBody ImageRequestDto imageRequestDto) {
+                                  @RequestBody ProjectRequestDto projectRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 수정 권한이 없습니다.");
         }
-        if (imageId.isEmpty() && imageRequestDto.getImageUrl().isEmpty()) {
+        if (imageId.isEmpty() && projectRequestDto.getImageUrl().isEmpty()) {
             return Response.failure(-1000, "이미지를 선택해주세요.");
         }
-        projectService.updateProject(project.getId(), Long.valueOf(imageId), projectRequestDto, imageRequestDto);
+        projectService.updateProject(project.getId(), Long.valueOf(imageId), projectRequestDto);
         return Response.success(projectService.findProjectDto(project.getId()));
     }
 
     @PatchMapping("/project/end")
     public Response endProject(@AuthenticationPrincipal User user, @RequestParam String projectId) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
-        if (project.getUserId().equals(user.getId())) {
+        if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 종료 권한이 없습니다.");
         }
-        projectService.endProject(Long.valueOf(projectId));
+        projectService.endProject(project.getId());
         return Response.success();
     }
 
     @DeleteMapping("/project/delete")
     public Response deleteProject(@AuthenticationPrincipal User user, @RequestParam String projectId) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
-        if (project.getUserId().equals(user.getId())) {
+        if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 삭제 권한이 없습니다.");
         }
         projectService.deleteProject(project.getId());
@@ -81,9 +71,6 @@ public class ProjectApiController {
 
     @GetMapping("/project/{projectId}/member/list")
     public Response getProjectMembers(@PathVariable String projectId) {
-        if (projectRepository.findById(Long.valueOf(projectId)).isEmpty()) {
-            return Response.failure(-1000, "프로젝트를 찾을 수 없습니다.");
-        }
         return Response.success(projectService.findProjectUserDtoListWithProjectId(Long.valueOf(projectId)));
     }
 
@@ -95,7 +82,6 @@ public class ProjectApiController {
         return Response.success(preMembers);
     }
 
-    // TODO: 추천 기준 수정 -> 비슷한 태그?
     @GetMapping("/project/recommend/list")
     public Response getRecommendProjects(@AuthenticationPrincipal User user) {
         return Response.success(projectService.findRecommendProjectDtoListWithUserId(user.getId()));

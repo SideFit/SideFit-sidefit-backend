@@ -1,5 +1,6 @@
 package com.project.sidefit.domain.repository.project;
 
+import com.project.sidefit.api.dto.QProjectDto_MemberResponseDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,40 @@ import static com.project.sidefit.domain.entity.QUser.*;
 public class ProjectUserRepositoryImpl implements ProjectUserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public List<MemberResponseDto> findMembers(Long projectId) {
+        List<ProjectUserResponseDto> projectUsers = queryFactory
+                .select(Projections.constructor(
+                        ProjectUserResponseDto.class,
+                        projectUser.id,
+                        user.id,
+                        project.id
+                ))
+                .from(projectUser)
+                .join(projectUser.user, user)
+                .join(projectUser.project, project)
+                .where(project.id.eq(projectId))
+                .fetch();
+
+        List<Long> userIds = projectUsers.stream()
+                .map(ProjectUserResponseDto::getUserId)
+                .collect(Collectors.toList());
+
+        return queryFactory
+                .select(new QProjectDto_MemberResponseDto(
+                        user.id,
+                        user.nickname,
+                        user.job,
+                        image.id,
+                        image.imageUrl
+                ))
+                .from(user)
+                .join(user.image, image)
+                .where(user.id.in(userIds))
+                .orderBy(user.createdDate.desc())
+                .fetch();
+    }
 
     @Override
     public List<MemberResponseDto> findPreMembers(List<Long> projectIds) {
@@ -42,12 +77,12 @@ public class ProjectUserRepositoryImpl implements ProjectUserRepositoryCustom {
                 .collect(Collectors.toList());
 
         return queryFactory
-                .select(Projections.constructor(
-                        MemberResponseDto.class,
+                .select(new QProjectDto_MemberResponseDto(
                         user.id,
-                        image.id,
                         user.nickname,
-                        user.job
+                        user.job,
+                        image.id,
+                        image.imageUrl
                 ))
                 .from(user)
                 .join(user.image, image)

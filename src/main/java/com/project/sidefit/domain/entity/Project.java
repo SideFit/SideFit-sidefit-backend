@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -28,6 +29,9 @@ public class Project extends BaseTime {
 
     @OneToMany(mappedBy = "project", orphanRemoval = true)
     private List<ProjectUser> projectUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    private List<Recruit> recruits = new ArrayList<>();
 
     @Column(length = 20, unique = true)
     private String title; // 프로젝트 제목
@@ -82,18 +86,41 @@ public class Project extends BaseTime {
         this.hashtag = hashtag;
     }
 
-    // TODO: User column 에 맞게 수정, 각 column 의 입력 방식에 따라 수정
+    /**
+     * 유저의 각 속성에 따른 점수 산정
+     * 직무 -> 프로젝트 모집 (Recruit) : 10점
+     * 기술 스택 -> 프로젝트 요구 스택 : 각 스택당 2점
+     * 관심 분야 -> 프로젝트 분야 : 각 분야당 1점
+     */
     public int recommendScoreByUser(User user) {
+        // 직무
+        List<String> jobGroups = recruits.stream()
+                .filter(recruit -> recruit.getCurrentNumber() != 0)
+                .map(Recruit::getJobGroup)
+                .collect(Collectors.toList());
+        String userJob = user.getJob();
+        // 기술 스택
+        String[] stacks = stack.split("#");
+        List<String> userStacks = user.getTeches().stream().map(Tech::getStack).collect(Collectors.toList());
+        // 관심 분야
+        String[] tags = hashtag.split("#");
+        List<String> userFavorites = user.getFavorites().stream().map(Favorite::getField).collect(Collectors.toList());
+
         int score = 0;
-//        if (user.getFavorite().equals(field)) {
-//            score += 5;
-//        }
-//        if (user.getStack().equals(stack)) {
-//            score += 3;
-//        }
-//        if (user.getStatus().equals(type)) {
-//            score += 2;
-//        }
+
+        if (jobGroups.contains(userJob)) {
+            score += 10;
+        }
+        for (String stack : stacks) {
+            if (userStacks.contains(stack)) {
+                score += 2;
+            }
+        }
+        for (String tag : tags) {
+            if (userFavorites.contains(tag)) {
+                score += 1;
+            }
+        }
         return score;
     }
 

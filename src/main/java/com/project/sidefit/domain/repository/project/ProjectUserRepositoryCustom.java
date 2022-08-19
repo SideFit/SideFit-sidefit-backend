@@ -6,5 +6,6 @@ import static com.project.sidefit.api.dto.ProjectDto.*;
 
 public interface ProjectUserRepositoryCustom {
 
+    List<MemberResponseDto> findMembers(Long projectId);
     List<MemberResponseDto> findPreMembers(List<Long> projectIds);
 }
