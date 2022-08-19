@@ -50,6 +50,11 @@ public class Apply extends BaseTime {
         if (status == 0 || status == 1) {
             if (status == flag) {
                 status = 2;
+                project.getRecruits().forEach(recruit -> {
+                    if (recruit.getJobGroup().equals(jobGroup)) {
+                        recruit.recruitComplete();
+                    }
+                });
             } else {
                 throw new IllegalStateException("잘못된 요청입니다.");
             }
