@@ -28,7 +28,7 @@ public class ApplyApiController {
     @PostMapping("/project/apply")
     public Response apply(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestBody ApplyRequestDto ApplyRequestDto) {
         Long applyId = applyService.applyToTeam(user.getId(), Long.valueOf(projectId), ApplyRequestDto);
-        return Response.success(applyService.findApplyDto(applyId));
+        return Response.success();
     }
 
     @PostMapping("/project/invite")
@@ -38,7 +38,7 @@ public class ApplyApiController {
             return Response.failure(-1000, "프로젝트 관리 권한이 없습니다.");
         }
         Long applyId = applyService.inviteToUser(Long.valueOf(receiverId), Long.valueOf(projectId), inviteRequestDto);
-        return Response.success(applyService.findApplyDto(applyId));
+        return Response.success();
     }
 
     // 프로젝트 팀장이 유저 지원 처리

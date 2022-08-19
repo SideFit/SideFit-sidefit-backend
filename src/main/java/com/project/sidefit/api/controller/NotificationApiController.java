@@ -30,11 +30,8 @@ public class NotificationApiController {
 
     @PostMapping("/notification/send")
     public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestBody NotificationRequestDto notificationRequestDto) {
-        if (userRepository.findById(Long.valueOf(receiverId)).isEmpty()) {
-            return Response.failure(-1000, "유저가 존재하지 않습니다.");
-        }
         notificationService.sendNotification(notificationRequestDto, user.getId(), Long.valueOf(receiverId));
-        return Response.success(notificationService.findNotificationDtoListWithSenderAndReceiverId(Long.valueOf(user.getUsername()), Long.valueOf(receiverId)));
+        return Response.success();
     }
 
     @GetMapping("/notification/list")

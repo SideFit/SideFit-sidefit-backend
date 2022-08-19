@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.project.sidefit.api.dto.NotificationDto.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -118,15 +119,9 @@ public class NotificationTest {
                                 fieldWithPath("type").type(JsonFieldType.STRING).description("알림 타입")
                         ),
                         responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("result.data.[].id").type(JsonFieldType.NUMBER).description("알림 id"),
-                                fieldWithPath("result.data.[].senderId").type(JsonFieldType.NUMBER).description("송신자 id"),
-                                fieldWithPath("result.data.[].receiverId").type(JsonFieldType.NUMBER).description("수신자 id"),
-                                fieldWithPath("result.data.[].content").type(JsonFieldType.STRING).description("알림 내용"),
-                                fieldWithPath("result.data.[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                                fieldWithPath("result.data.[].createdDate").type(JsonFieldType.STRING).description("생성 일자"),
-                                fieldWithPath("result.data.[].lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("결과 메시지")
                         )
                 ));
     }
