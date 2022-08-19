@@ -2,7 +2,8 @@ package com.project.sidefit.api.dto;
 
 import com.project.sidefit.domain.entity.Project;
 import com.project.sidefit.domain.entity.ProjectUser;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.Recruit;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,24 @@ public class ProjectDto {
 
         @NotNull
         private String hashtag; // 해시 태그 (# 태그 입력)
+
+        private String name; // 이미지 이름
+
+        private String imageUrl; // 이미지 url
+
+        private List<RecruitRequestDto> recruits; // 모집 직군 인원 리스트
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecruitRequestDto {
+
+        @NotNull
+        private String jobGroup;
+
+        @NotNull
+        private Integer recruitNumber;
     }
 
     @Getter
@@ -63,7 +82,7 @@ public class ProjectDto {
         private Boolean status;
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
-        private List<ProjectUserResponseDto> projectUsers;
+        private List<RecruitResponseDto> recruits;
 
         public ProjectResponseDto(Project project) {
             id = project.getId();
@@ -79,9 +98,29 @@ public class ProjectDto {
             status = project.isStatus();
             createdDate = project.getCreatedDate();
             lastModifiedDate = project.getLastModifiedDate();
-            projectUsers = project.getProjectUsers().stream()
-                    .map(ProjectUserResponseDto::new)
-                    .collect(Collectors.toList());
+            recruits = project.getRecruits().stream()
+                    .map(RecruitResponseDto::new)
+                    .collect(Collectors.toList());;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecruitResponseDto {
+
+        private Long id;
+        private Long projectId;
+        private String jobGroup;
+        private Integer currentNumber;
+        private Integer recruitNumber;
+
+        public RecruitResponseDto(Recruit recruit) {
+            id = recruit.getId();
+            projectId = recruit.getProject().getId();
+            jobGroup = recruit.getJobGroup();
+            currentNumber = recruit.getCurrentNumber();
+            recruitNumber = recruit.getRecruitNumber();
         }
     }
 
@@ -103,19 +142,24 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class MemberResponseDto {
 
+        // user
         private Long id;
-        private Long imageId;
         private String nickname;
         private String job;
 
-        public MemberResponseDto(User user) {
-            id = user.getId();
-            imageId = user.getImage().getId();
-            nickname = user.getNickname();
-            job = user.getJob();
+        // image
+        private Long imageId;
+        private String imageUrl;
+
+        @QueryProjection
+        public MemberResponseDto(Long id, String nickname, String job, Long imageId, String imageUrl) {
+            this.id = id;
+            this.nickname = nickname;
+            this.job = job;
+            this.imageId = imageId;
+            this.imageUrl = imageUrl;
         }
     }
 
