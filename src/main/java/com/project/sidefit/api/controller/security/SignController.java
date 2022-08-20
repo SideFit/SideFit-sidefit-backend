@@ -91,6 +91,7 @@ public class SignController {
      * UserPrev 의 enable = true 로 변경
      *
      * TODO 현재 이메일에서 해당 링크 누르면 json 형태의 결과가 나옴 >> 이 부분 처리 필요
+     * TODO Post?
      * 문제 발생 >> 크롬에서 링크를 눌렀을 경우 정상처리는 되지만 error 발생, postman 에서 테스트 한 경우는 정상동작
      */
     @GetMapping("/confirm-email/{token}")

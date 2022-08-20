@@ -79,8 +79,6 @@ public class UserController {
 
     /**
      * 비밀번호 변경 처리
-     *
-     *
      */
     @PatchMapping("/user/password/{token}")
     public Response updatePassword(@PathVariable String token, @RequestBody PasswordRequestDto passwordRequestDto) {

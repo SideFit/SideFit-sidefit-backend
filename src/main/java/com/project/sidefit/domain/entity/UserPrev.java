@@ -14,7 +14,7 @@ import javax.persistence.Id;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class UserPrev {
+public class UserPrev extends BaseTime {
 
     @Id
     @GeneratedValue
