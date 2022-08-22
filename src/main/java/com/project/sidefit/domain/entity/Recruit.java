@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Recruit extends BaseTime {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,10 +40,11 @@ public class Recruit extends BaseTime {
     }
 
     public void recruitComplete() {
-        currentNumber += 1;
-        if (currentNumber > recruitNumber) {
+        int temp = currentNumber + 1;
+        if (temp > recruitNumber) {
             throw new IllegalStateException("더 이상 모집할 수 없습니다.");
         }
+        currentNumber = temp;
     }
 
     // 연관관계 편의 메소드
