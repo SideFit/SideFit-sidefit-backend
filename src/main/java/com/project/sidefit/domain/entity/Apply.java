@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class Apply extends BaseTime {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

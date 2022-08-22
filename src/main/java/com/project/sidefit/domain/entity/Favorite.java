@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class Favorite {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 100)
