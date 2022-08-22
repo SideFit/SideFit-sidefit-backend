@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class User extends BaseTime implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
