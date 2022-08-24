@@ -86,4 +86,13 @@ public class ProjectApiController {
     public Response getRecommendProjects(@AuthenticationPrincipal User user) {
         return Response.success(projectService.findRecommendProjectDtoListWithUserId(user.getId()));
     }
+
+    // TODO: 검색어 뿐만 아니라 부가 옵션도 고려 (최신순, 조회순 등등) -> DTO(?)
+    @GetMapping("/project/search")
+    public Response searchProject(@Valid @RequestBody SearchRequestDto searchRequestDto, BindingResult result) {
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
+        }
+        return Response.success(projectRepository.searchProject(searchRequestDto.getKeyword()));
+    }
 }

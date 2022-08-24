@@ -67,6 +67,56 @@ public class ProjectDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SearchRequestDto {
+
+        @NotBlank(message = "검색하려는 키워드를 입력해주세요.")
+        private String keyword;
+
+        @NotNull
+        private String query; // 최신순, 조회순..?
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ProjectQueryDto {
+
+        // project
+        private Long id;
+        private String title;
+        private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
+        private String hashtag;
+        private Boolean status;
+        private LocalDateTime createdDate;
+        private LocalDateTime lastModifiedDate;
+
+        // image
+        private Long imageId;
+        private String imageUrl;
+
+        // recruit
+        private List<RecruitResponseDto> recruits;
+
+        public void setRecruits(List<RecruitResponseDto> recruits) {
+            this.recruits = recruits;
+        }
+
+        @QueryProjection
+        public ProjectQueryDto(Long id, String title, Integer type, String hashtag, Boolean status, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String imageUrl) {
+            this.id = id;
+            this.title = title;
+            this.type = type;
+            this.hashtag = hashtag;
+            this.status = status;
+            this.createdDate = createdDate;
+            this.lastModifiedDate = lastModifiedDate;
+            this.imageId = imageId;
+            this.imageUrl = imageUrl;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProjectResponseDto {
 
         private Long id;
