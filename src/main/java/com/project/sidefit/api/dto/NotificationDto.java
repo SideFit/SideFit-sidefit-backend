@@ -18,10 +18,10 @@ public class NotificationDto {
     @AllArgsConstructor
     public static class NotificationRequestDto {
 
-        @NotBlank
+        @NotBlank(message = "내용을 입력해주세요.")
         private String content;
 
-        @NotNull
+        @NotNull(message = "알림 타입을 정해주세요.")
         private NotificationType type; // CHAT, PERSONAL
     }
 

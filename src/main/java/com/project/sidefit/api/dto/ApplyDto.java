@@ -16,7 +16,7 @@ public class ApplyDto {
     @AllArgsConstructor
     public static class ApplyRequestDto {
 
-        @NotBlank
+        @NotBlank(message = "직군을 입력해주세요.")
         private String jobGroup;
 
         private String comment;
@@ -28,7 +28,7 @@ public class ApplyDto {
     @AllArgsConstructor
     public static class InviteRequestDto {
 
-        @NotBlank
+        @NotBlank(message = "직군을 입력해주세요.")
         private String jobGroup;
     }
 

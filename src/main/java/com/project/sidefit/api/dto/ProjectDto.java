@@ -21,28 +21,28 @@ public class ProjectDto {
     @AllArgsConstructor
     public static class ProjectRequestDto {
 
-        @NotBlank
+        @NotBlank(message = "제목을 입력해주세요.")
         private String title; // 프로젝트 제목
 
-        @NotNull
+        @NotNull(message = "프로젝트 타입을 정해주세요.")
         private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
 
-        @NotNull
+        @NotNull(message = "프로젝트 분야를 입력해주세요.")
         private String field; // 프로젝트 분야
 
-        @NotBlank
+        @NotBlank(message = "소개를 입력해주세요.")
         private String introduction; // 프로젝트 소개
 
-        @NotNull
+        @NotNull(message = "예상 기간을 입력해주세요.")
         private String period; // 예상 프로젝트 기간
 
-        @NotNull
+        @NotNull(message = "필요한 스택을 입력해주세요.")
         private String stack; // 필요 스택 (# 태그 입력)
 
-        @NotNull
+        @NotNull(message = "모임 계획을 입력해주세요.")
         private String meetingPlan; // 모임 계획
 
-        @NotNull
+        @NotNull(message = "해시 태그를 입력해주세요.")
         private String hashtag; // 해시 태그 (# 태그 입력)
 
         private String name; // 이미지 이름
@@ -57,10 +57,10 @@ public class ProjectDto {
     @AllArgsConstructor
     public static class RecruitRequestDto {
 
-        @NotNull
+        @NotNull(message = "직군을 입력해주세요.")
         private String jobGroup;
 
-        @NotNull
+        @NotNull(message = "인원을 정해주세요.")
         private Integer recruitNumber;
     }
 
