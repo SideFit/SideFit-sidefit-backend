@@ -40,12 +40,12 @@ public class SignService {
     /**
      * 해당 email을 가진 user가 존재하는지? email 중복 체크
      *
-     * @return true: 중복, false: 중복X
+     * @return true: 중복O, false: 중복X
      */
     public boolean validateDuplicatedEmail(String email) {
 
-        // User 테이블, 임시 테이블 모두 같은 이메일이 없어야 하지 않는지
-        return userJpaRepo.existsByEmail(email);
+        // User 테이블, UserPrev 테이블 모두 없어야 한다.
+        return userJpaRepo.existsByEmail(email) || userPrevJpaRepo.existsByEmail(email);
     }
 
     public boolean validateDuplicatedNickname(String nickname) {
@@ -130,8 +130,7 @@ public class SignService {
     @Transactional
     public void join(String email, String nickname, String job) {
 
-        // TODO orElseThrow() 에 예외 넣기
-        UserPrev userPrev = userPrevJpaRepo.findByEmailAndEnable(email, true).orElseThrow();
+        UserPrev userPrev = userPrevJpaRepo.findByEmailAndEnable(email, true).orElseThrow(RuntimeException::new);
 
         // 넘어온 데이터 + email이 일치하는 userPrev 조합으로 User 생성
         User user = User.createUser(email, userPrev.getPassword(), nickname, job);

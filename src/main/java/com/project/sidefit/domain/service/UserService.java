@@ -41,6 +41,7 @@ public class UserService {
         return new UserDetailDto(user);
     }
 
+    // TODO 쿼리가 이상함
     @Transactional
     public Long save(User user1) {
         User user = userJpaRepo.findById(user1.getId()).get();

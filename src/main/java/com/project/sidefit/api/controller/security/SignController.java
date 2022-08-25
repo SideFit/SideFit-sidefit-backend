@@ -56,10 +56,6 @@ public class SignController {
             return Response.failure(-1000, "이미 존재하는 이메일입니다.");
         }
 
-        // UserPrevJpaRepo 에서 email 중복 체크 
-        // 중복일 경우 해당 정보 반환
-
-        // password == passwordCheck 인지 확인
         if (!password.equals(userPrevRequestDto.getPasswordCheck())) {
             return Response.failure(-1100, "패스워드가 일치하지 않습니다.");
         }
@@ -73,7 +69,6 @@ public class SignController {
         // UserPrev 에 저장
         signService.saveUserPrev(email, password);
 
-        // 인증 메일 전송
         return Response.success();
     }
 
@@ -111,7 +106,7 @@ public class SignController {
             return Response.success();
         }
 
-        return Response.failure(1000, "인증X");
+        return Response.failure(1000, "이메일 인증이 되지 않았습니다.");
     }
 
 

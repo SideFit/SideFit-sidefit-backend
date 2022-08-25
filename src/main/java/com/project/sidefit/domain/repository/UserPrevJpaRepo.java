@@ -9,4 +9,6 @@ public interface UserPrevJpaRepo extends JpaRepository<UserPrev, Long> {
     Optional<UserPrev> findByEmailAndEnable(String email, boolean enable);
 
     boolean existsByEmailAndEnable(String email, boolean enable);
+
+    boolean existsByEmail(String email);
 }
