@@ -21,28 +21,28 @@ public class ProjectDto {
     @AllArgsConstructor
     public static class ProjectRequestDto {
 
-        @NotBlank
+        @NotBlank(message = "제목을 입력해주세요.")
         private String title; // 프로젝트 제목
 
-        @NotNull
+        @NotNull(message = "프로젝트 타입을 정해주세요.")
         private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
 
-        @NotNull
+        @NotNull(message = "프로젝트 분야를 입력해주세요.")
         private String field; // 프로젝트 분야
 
-        @NotBlank
+        @NotBlank(message = "소개를 입력해주세요.")
         private String introduction; // 프로젝트 소개
 
-        @NotNull
+        @NotNull(message = "예상 기간을 입력해주세요.")
         private String period; // 예상 프로젝트 기간
 
-        @NotNull
+        @NotNull(message = "필요한 스택을 입력해주세요.")
         private String stack; // 필요 스택 (# 태그 입력)
 
-        @NotNull
+        @NotNull(message = "모임 계획을 입력해주세요.")
         private String meetingPlan; // 모임 계획
 
-        @NotNull
+        @NotBlank(message = "해시 태그를 입력해주세요.")
         private String hashtag; // 해시 태그 (# 태그 입력)
 
         private String name; // 이미지 이름
@@ -57,11 +57,61 @@ public class ProjectDto {
     @AllArgsConstructor
     public static class RecruitRequestDto {
 
-        @NotNull
+        @NotNull(message = "직군을 입력해주세요.")
         private String jobGroup;
 
-        @NotNull
+        @NotNull(message = "인원을 정해주세요.")
         private Integer recruitNumber;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SearchRequestDto {
+
+        @NotBlank(message = "검색하려는 키워드를 입력해주세요.")
+        private String keyword;
+
+        @NotNull
+        private String query; // 최신순, 조회순..?
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ProjectQueryDto {
+
+        // project
+        private Long id;
+        private String title;
+        private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
+        private String hashtag;
+        private Boolean status;
+        private LocalDateTime createdDate;
+        private LocalDateTime lastModifiedDate;
+
+        // image
+        private Long imageId;
+        private String imageUrl;
+
+        // recruit
+        private List<RecruitResponseDto> recruits;
+
+        public void setRecruits(List<RecruitResponseDto> recruits) {
+            this.recruits = recruits;
+        }
+
+        @QueryProjection
+        public ProjectQueryDto(Long id, String title, Integer type, String hashtag, Boolean status, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String imageUrl) {
+            this.id = id;
+            this.title = title;
+            this.type = type;
+            this.hashtag = hashtag;
+            this.status = status;
+            this.createdDate = createdDate;
+            this.lastModifiedDate = lastModifiedDate;
+            this.imageId = imageId;
+            this.imageUrl = imageUrl;
+        }
     }
 
     @Getter

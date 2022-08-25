@@ -6,8 +6,10 @@ import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.project.sidefit.api.dto.ProjectDto.*;
@@ -26,7 +28,7 @@ public class ProjectApiController {
     }
 
     @PostMapping("/project")
-    public Response createProject(@AuthenticationPrincipal User user, @RequestParam(required = false) String imageId, @RequestBody ProjectRequestDto projectRequestDto) {
+    public Response createProject(@AuthenticationPrincipal User user, @RequestParam(required = false) String imageId, @Valid @RequestBody ProjectRequestDto projectRequestDto) {
         if (imageId.isEmpty() && projectRequestDto.getImageUrl().isEmpty()) {
             return Response.failure(-1000, "이미지를 선택해주세요.");
         }
@@ -37,7 +39,7 @@ public class ProjectApiController {
     // TODO: 어떤 필드를 업데이트 할 수 있는지?
     @PatchMapping("/project")
     public Response updateProject(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestParam(required = false) String imageId,
-                                  @RequestBody ProjectRequestDto projectRequestDto) {
+                                  @Valid @RequestBody ProjectRequestDto projectRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 수정 권한이 없습니다.");
@@ -85,5 +87,14 @@ public class ProjectApiController {
     @GetMapping("/project/recommend/list")
     public Response getRecommendProjects(@AuthenticationPrincipal User user) {
         return Response.success(projectService.findRecommendProjectDtoListWithUserId(user.getId()));
+    }
+
+    // TODO: 검색어 뿐만 아니라 부가 옵션도 고려 (최신순, 조회순 등등) -> DTO(?)
+    @GetMapping("/project/search")
+    public Response searchProject(@Valid @RequestBody SearchRequestDto searchRequestDto, BindingResult result) {
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
+        }
+        return Response.success(projectRepository.searchProject(searchRequestDto.getKeyword()));
     }
 }

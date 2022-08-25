@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static com.project.sidefit.api.dto.NotificationDto.*;
 
 @RestController
@@ -29,7 +31,7 @@ public class NotificationApiController {
     }
 
     @PostMapping("/notification/send")
-    public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestBody NotificationRequestDto notificationRequestDto) {
+    public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @Valid @RequestBody NotificationRequestDto notificationRequestDto) {
         notificationService.sendNotification(notificationRequestDto, user.getId(), Long.valueOf(receiverId));
         return Response.success();
     }
