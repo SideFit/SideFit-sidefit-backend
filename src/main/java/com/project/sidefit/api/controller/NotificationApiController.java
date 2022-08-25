@@ -8,7 +8,6 @@ import com.project.sidefit.domain.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,11 +31,7 @@ public class NotificationApiController {
     }
 
     @PostMapping("/notification/send")
-    public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @Valid @RequestBody NotificationRequestDto notificationRequestDto,
-                                     BindingResult result) {
-        if (result.hasErrors()) {
-            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
-        }
+    public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @Valid @RequestBody NotificationRequestDto notificationRequestDto) {
         notificationService.sendNotification(notificationRequestDto, user.getId(), Long.valueOf(receiverId));
         return Response.success();
     }

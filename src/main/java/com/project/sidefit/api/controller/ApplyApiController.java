@@ -9,7 +9,6 @@ import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,20 +28,13 @@ public class ApplyApiController {
     private final ProjectRepository projectRepository;
 
     @PostMapping("/project/apply")
-    public Response apply(@AuthenticationPrincipal User user, @RequestParam String projectId, @Valid @RequestBody ApplyRequestDto ApplyRequestDto, BindingResult result) {
-        if (result.hasErrors()) {
-            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
-        }
+    public Response apply(@AuthenticationPrincipal User user, @RequestParam String projectId, @Valid @RequestBody ApplyRequestDto ApplyRequestDto) {
         Long applyId = applyService.applyToTeam(user.getId(), Long.valueOf(projectId), ApplyRequestDto);
         return Response.success();
     }
 
     @PostMapping("/project/invite")
-    public Response invite(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestParam String projectId,
-                           @Valid @RequestBody InviteRequestDto inviteRequestDto, BindingResult result) {
-        if (result.hasErrors()) {
-            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
-        }
+    public Response invite(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestParam String projectId, @Valid @RequestBody InviteRequestDto inviteRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 관리 권한이 없습니다.");
