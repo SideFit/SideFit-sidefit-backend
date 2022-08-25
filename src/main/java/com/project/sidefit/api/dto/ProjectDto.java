@@ -42,7 +42,7 @@ public class ProjectDto {
         @NotNull(message = "모임 계획을 입력해주세요.")
         private String meetingPlan; // 모임 계획
 
-        @NotNull(message = "해시 태그를 입력해주세요.")
+        @NotBlank(message = "해시 태그를 입력해주세요.")
         private String hashtag; // 해시 태그 (# 태그 입력)
 
         private String name; // 이미지 이름

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class ApplyDto {
@@ -16,7 +16,7 @@ public class ApplyDto {
     @AllArgsConstructor
     public static class ApplyRequestDto {
 
-        @NotBlank(message = "직군을 입력해주세요.")
+        @NotNull(message = "직군을 입력해주세요.")
         private String jobGroup;
 
         private String comment;
@@ -28,7 +28,7 @@ public class ApplyDto {
     @AllArgsConstructor
     public static class InviteRequestDto {
 
-        @NotBlank(message = "직군을 입력해주세요.")
+        @NotNull(message = "직군을 입력해주세요.")
         private String jobGroup;
     }
 
