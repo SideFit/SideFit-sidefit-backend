@@ -100,6 +100,27 @@ public class User extends BaseTime implements UserDetails {
         this.password = password;
     }
 
+    public void updateUser(String job, String introduction, List<Tag> tags, List<Favorite> favorites,
+                           List<CurrentStatus> currentStatuses, List<Tech> teches, Mbti mbti) {
+
+        this.job = job;
+        this.introduction = introduction;
+
+        this.tags.clear();
+        this.tags.addAll(tags);
+
+        this.favorites.clear();
+        this.favorites.addAll(favorites);
+
+        this.currentStatuses.clear();
+        this.currentStatuses.addAll(currentStatuses);
+
+        this.teches.clear();
+        this.teches.addAll(teches);
+
+        this.mbti = mbti;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles
