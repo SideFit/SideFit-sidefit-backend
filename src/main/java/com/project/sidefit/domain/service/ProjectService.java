@@ -38,23 +38,26 @@ public class ProjectService {
         Project project = createProject(projectRequestDto, user, image);
         ProjectUser projectUser = ProjectUser.createProjectUser(user, project);
 
+        projectRepository.save(project);
+        projectUserRepository.save(projectUser);
+
         for (RecruitRequestDto dto : projectRequestDto.getRecruits()) {
             Recruit recruit = Recruit.create(project, dto.getJobGroup(), dto.getRecruitNumber());
             recruitRepository.save(recruit);
         }
-        projectUserRepository.save(projectUser);
-
         String[] hashtags = project.getHashtag().split("#");
         for (String hashtag : hashtags) {
-            Optional<Keyword> recommendKeywordOptional = keywordRepository.findByWord(hashtag);
-            if (recommendKeywordOptional.isPresent()) {
-                recommendKeywordOptional.get().addCount();
-            } else {
-                Keyword keyword = new Keyword(hashtag, 1);
-                keywordRepository.save(keyword);
+            if (!hashtag.equals("")) {
+                Optional<Keyword> recommendKeywordOptional = keywordRepository.findByWord(hashtag);
+                if (recommendKeywordOptional.isPresent()) {
+                    recommendKeywordOptional.get().addCount();
+                } else {
+                    Keyword keyword = new Keyword(hashtag, 1);
+                    keywordRepository.save(keyword);
+                }
             }
         }
-        return projectRepository.save(project).getId();
+        return project.getId();
     }
 
     // TODO: 어떤 필드를 수정하는지?
@@ -127,7 +130,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<KeywordResponseDto> findRecommendKeywordDtoList() {
-        return keywordRepository.findTop10OrderByCountDesc().stream()
+        return keywordRepository.findTop10ByOrderByCountDesc().stream()
                 .map(KeywordResponseDto::new)
                 .collect(Collectors.toList());
     }

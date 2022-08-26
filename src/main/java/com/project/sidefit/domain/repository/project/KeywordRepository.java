@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
     Optional<Keyword> findByWord(String word);
-    List<Keyword> findTop10OrderByCountDesc();
+    List<Keyword> findTop10ByOrderByCountDesc();
 }
