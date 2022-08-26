@@ -1,6 +1,7 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.PasswordRequestDto;
+import com.project.sidefit.api.dto.UserRequestDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.domain.entity.User;
@@ -44,10 +45,13 @@ public class UserController {
     /**
      * 프로필 수정
      */
-//    @PatchMapping("/user/{id}")
-//    public Response updateUser(@PathVariable Long id) {
-//
-//    }
+    @PatchMapping("/user/{id}")
+    public Response updateUser(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
+
+        userService.updateUser(id, userRequestDto.toUserDto());
+
+        return Response.success();
+    }
 
     /**
      * 테스트용

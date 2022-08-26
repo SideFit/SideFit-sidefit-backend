@@ -2,10 +2,12 @@ package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.api.dto.PasswordRequestDto;
+import com.project.sidefit.api.dto.UserRequestDto;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.domain.entity.Mbti;
 import com.project.sidefit.domain.service.UserService;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
+import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.http.MediaType.*;
@@ -169,6 +170,47 @@ public class UserControllerTest {
                 .andDo(document("change_password",
                         pathParameters(
                                 parameterWithName("token").description("이메일 인증 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result").type(NULL).description("반환 데이터")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("프로필 변경 : Patch /api/user/{id}")
+    public void 프로필_변경() throws Exception {
+        //given
+        UserRequestDto userRequestDto = UserRequestDto.builder().job("frontend").introduction("hi~test").tags(new ArrayList<>()).currentStatuses(new ArrayList<>())
+                .favorites(new ArrayList<>()).teches(new ArrayList<>()).mbti(Mbti.ENFP).build();
+
+        UserDto userDto = userRequestDto.toUserDto();
+        willDoNothing().given(userService).updateUser(anyLong(), eq(userDto));
+
+        //when
+        ResultActions result = this.mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/user/{id}", 1L)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRequestDto))
+                .accept(APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("update_user",
+                        pathParameters(
+                                parameterWithName("id").description("user PK")
+                        ),
+                        requestFields(
+                                fieldWithPath("job").type(STRING).description("직군"),
+                                fieldWithPath("introduction").type(STRING).description("자기 소개"),
+                                fieldWithPath("tags").type(ARRAY).description("태그"),
+                                fieldWithPath("currentStatuses").type(ARRAY).description("현재 상태"),
+                                fieldWithPath("favorites").type(ARRAY).description("관심 분야"),
+                                fieldWithPath("teches").type(ARRAY).description("기술 스택"),
+                                fieldWithPath("mbti").type(STRING).description("mbti")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),

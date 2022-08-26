@@ -6,6 +6,7 @@ import com.project.sidefit.domain.entity.*;
 import com.project.sidefit.domain.repository.ConfirmationTokenJpaRepo;
 import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
+import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
 import com.project.sidefit.domain.service.mail.MailService;
 import lombok.RequiredArgsConstructor;
@@ -79,5 +80,17 @@ public class UserService {
         // TODO 사용된 토큰 삭제처리?
         User user = userJpaRepo.findByEmail(confirmationToken.getEmail()).orElseThrow(IllegalStateException::new);
         user.updatePassword(passwordEncoder.encode(password));
+    }
+
+    @Transactional
+    public void updateUser(Long id, UserDto userDto) {
+        User user = userJpaRepo.findById(id).orElseThrow(RuntimeException::new);
+
+        List<Tag> tags = userDto.getTags().stream().map(tag -> new Tag(tag)).collect(Collectors.toList());
+        List<Favorite> favorites = userDto.getFavorites().stream().map(favorite -> new Favorite(favorite)).collect(Collectors.toList());
+        List<CurrentStatus> currentStatuses = userDto.getCurrentStatuses().stream().map(status -> new CurrentStatus(status)).collect(Collectors.toList());
+        List<Tech> teches = userDto.getTeches().stream().map(tech -> new Tech(tech)).collect(Collectors.toList());
+
+        user.updateUser(userDto.getJob(), userDto.getIntroduction(), tags, favorites, currentStatuses, teches, userDto.getMbti());
     }
 }

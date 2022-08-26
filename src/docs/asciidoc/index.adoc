@@ -156,6 +156,16 @@ include::{snippets}/change_password/http-request.adoc[]
 include::{snippets}/change_password/http-response.adoc[]
 include::{snippets}/change_password/curl-request.adoc[]
 
+=== 프로필 변경
+RequestBody
+include::{snippets}/update_user/path-parameters.adoc[]
+include::{snippets}/update_user/request-fields.adoc[]
+ResponseBody
+include::{snippets}/update_user/response-fields.adoc[]
+include::{snippets}/update_user/http-request.adoc[]
+include::{snippets}/update_user/http-response.adoc[]
+include::{snippets}/update_user/curl-request.adoc[]
+
 
 == project
 === 프로젝트 조회
