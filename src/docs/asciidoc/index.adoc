@@ -221,6 +221,38 @@ include::{snippets}/get_project_recommend_list/http-request.adoc[]
 include::{snippets}/get_project_recommend_list/http-response.adoc[]
 include::{snippets}/get_project_recommend_list/curl-request.adoc[]
 
+=== 프로젝트 검색
+PathParameters
+
+include::{snippets}/get_project_search/path-parameters.adoc[]
+RequestBody
+include::{snippets}/get_project_search/request-fields.adoc[]
+ResponseBody
+include::{snippets}/get_project_search/response-fields.adoc[]
+
+include::{snippets}/get_project_search/http-request.adoc[]
+include::{snippets}/get_project_search/http-response.adoc[]
+include::{snippets}/get_project_search/curl-request.adoc[]
+
+=== 프로젝트 키워드 추천
+ResponseBody
+include::{snippets}/get_project_search_recommend_list/response-fields.adoc[]
+
+include::{snippets}/get_project_search_recommend_list/http-request.adoc[]
+include::{snippets}/get_project_search_recommend_list/http-response.adoc[]
+include::{snippets}/get_project_search_recommend_list/curl-request.adoc[]
+
+=== 프로젝트 추천 키워드 선택
+PathParameters
+
+include::{snippets}/get_project_search_recommend_keyword/path-parameters.adoc[]
+ResponseBody
+include::{snippets}/get_project_search_recommend_keyword/response-fields.adoc[]
+
+include::{snippets}/get_project_search_recommend_keyword/http-request.adoc[]
+include::{snippets}/get_project_search_recommend_keyword/http-response.adoc[]
+include::{snippets}/get_project_search_recommend_keyword/curl-request.adoc[]
+
 
 == apply
 === 유저 지원
