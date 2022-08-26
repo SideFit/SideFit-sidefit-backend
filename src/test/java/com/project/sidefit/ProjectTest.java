@@ -2,10 +2,13 @@ package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.domain.entity.Image;
+import com.project.sidefit.domain.entity.Keyword;
 import com.project.sidefit.domain.entity.ProjectUser;
 import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.ImageRepository;
 import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.project.KeywordRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import com.project.sidefit.domain.service.ProjectService;
@@ -64,6 +67,9 @@ public class ProjectTest {
 
     @Autowired
     private ImageRepository imageRepository;
+
+    @Autowired
+    private KeywordRepository keywordRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -436,6 +442,170 @@ public class ProjectTest {
                                 fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
                                 fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
                                 fieldWithPath("result.data[].lastModifiedDate").type(STRING).description("수정 일자")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("GET /api/project/search")
+    void search_project_test() throws Exception {
+        //given
+        Image image = new Image("default-image", "url");
+        imageRepository.save(image);
+
+        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
+        teamLeader.updateImage(image);
+        userRepository.save(teamLeader);
+
+        TokenDto token = signService.login("leader@gmail.com", "pw");
+
+        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
+        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
+        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
+        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
+
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#hashtag3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
+
+        SearchRequestDto searchRequestDto = new SearchRequestDto("test", SearchCondition.LATEST_ORDER);
+
+        //when
+        ResultActions result = mockMvc.perform(get("/api/project/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(searchRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("get_project_search",
+                        requestFields(
+                                fieldWithPath("keyword").type(STRING).description("검색 키워드"),
+                                fieldWithPath("condition").type(STRING).description("검색 조건")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data[].id").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].title").type(STRING).description("프로젝트 제목"),
+                                fieldWithPath("result.data[].type").type(NUMBER).description("프로젝트 유형"),
+                                fieldWithPath("result.data[].hashtag").type(STRING).description("프로젝트 해시태그"),
+                                fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
+                                fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
+                                fieldWithPath("result.data[].lastModifiedDate").type(STRING).description("수정 일자"),
+                                fieldWithPath("result.data[].imageId").type(NUMBER).description("이미지 id"),
+                                fieldWithPath("result.data[].imageUrl").type(STRING).description("이미지 url"),
+                                fieldWithPath("result.data[].recruits[].id").type(NUMBER).description("모집 id"),
+                                fieldWithPath("result.data[].recruits[].projectId").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].recruits[].jobGroup").type(STRING).description("모집 직군"),
+                                fieldWithPath("result.data[].recruits[].currentNumber").type(NUMBER).description("현재 인원"),
+                                fieldWithPath("result.data[].recruits[].recruitNumber").type(NUMBER).description("모집 인원")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("GET /api/project/search/recommend/list")
+    void recommend_keyword_test() throws Exception {
+        //given
+        Image image = new Image("default-image", "url");
+        imageRepository.save(image);
+
+        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
+        teamLeader.updateImage(image);
+        userRepository.save(teamLeader);
+
+        TokenDto token = signService.login("leader@gmail.com", "pw");
+
+        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
+        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
+        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
+        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
+
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#h1#h2#h3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#h4#h5#h6", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#h7#h8#h9", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
+
+        //when
+        ResultActions result = mockMvc.perform(get("/api/project/search/recommend/list").contentType(MediaType.APPLICATION_JSON));
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("get_project_search_recommend_list",
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data[].id").type(NUMBER).description("키워드 id"),
+                                fieldWithPath("result.data[].word").type(STRING).description("키워드")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("GET /api/project/search/recommend/{keywordId}")
+    void select_recommend_keyword_test() throws Exception {
+        //given
+        Image image = new Image("default-image", "url");
+        imageRepository.save(image);
+
+        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
+        teamLeader.updateImage(image);
+        userRepository.save(teamLeader);
+
+        TokenDto token = signService.login("leader@gmail.com", "pw");
+
+        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
+        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
+        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
+        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
+
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#h1#h2#h3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#h4#h5#h6", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#h7#h8#h9", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
+        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
+
+        Keyword keyword = keywordRepository.findByWord("h1").get();
+
+        //when
+        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/search/recommend/{keywordId}", keyword.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("get_project_search_recommend_keyword",
+                        pathParameters(
+                                parameterWithName("keywordId").description("키워드 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data[].id").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].title").type(STRING).description("프로젝트 제목"),
+                                fieldWithPath("result.data[].type").type(NUMBER).description("프로젝트 유형"),
+                                fieldWithPath("result.data[].hashtag").type(STRING).description("프로젝트 해시태그"),
+                                fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
+                                fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
+                                fieldWithPath("result.data[].lastModifiedDate").type(STRING).description("수정 일자"),
+                                fieldWithPath("result.data[].imageId").type(NUMBER).description("이미지 id"),
+                                fieldWithPath("result.data[].imageUrl").type(STRING).description("이미지 url"),
+                                fieldWithPath("result.data[].recruits[].id").type(NUMBER).description("모집 id"),
+                                fieldWithPath("result.data[].recruits[].projectId").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].recruits[].jobGroup").type(STRING).description("모집 직군"),
+                                fieldWithPath("result.data[].recruits[].currentNumber").type(NUMBER).description("현재 인원"),
+                                fieldWithPath("result.data[].recruits[].recruitNumber").type(NUMBER).description("모집 인원")
                         )
                 ));
     }

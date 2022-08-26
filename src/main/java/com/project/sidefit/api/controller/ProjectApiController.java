@@ -6,13 +6,13 @@ import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 import static com.project.sidefit.api.dto.ProjectDto.*;
+import static com.project.sidefit.domain.enums.SearchCondition.*;
 
 @RestController
 @RequestMapping("/api")
@@ -41,7 +41,7 @@ public class ProjectApiController {
     public Response updateProject(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestParam(required = false) String imageId,
                                   @Valid @RequestBody ProjectRequestDto projectRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
-        if (project.getUserId().equals(user.getId())) {
+        if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 수정 권한이 없습니다.");
         }
         if (imageId.isEmpty() && projectRequestDto.getImageUrl().isEmpty()) {
@@ -89,12 +89,25 @@ public class ProjectApiController {
         return Response.success(projectService.findRecommendProjectDtoListWithUserId(user.getId()));
     }
 
-    // TODO: 검색어 뿐만 아니라 부가 옵션도 고려 (최신순, 조회순 등등) -> DTO(?)
     @GetMapping("/project/search")
-    public Response searchProject(@Valid @RequestBody SearchRequestDto searchRequestDto, BindingResult result) {
-        if (result.hasErrors()) {
-            result.getAllErrors().forEach(e -> Response.failure(-1000, e.getDefaultMessage()));
+    public Response searchProject(@Valid @RequestBody SearchRequestDto searchRequestDto) {
+        if (searchRequestDto.getCondition().equals(LATEST_ORDER)) {
+            return Response.success(projectRepository.searchProjectByLatestOrder(searchRequestDto.getKeyword()));
         }
-        return Response.success(projectRepository.searchProject(searchRequestDto.getKeyword()));
+        if (searchRequestDto.getCondition().equals(ACCURACY_ORDER)) {
+            return Response.success(projectRepository.searchProjectByAccuracyOrder(searchRequestDto.getKeyword()));
+        }
+        return Response.failure(-1000, "검색 조건이 충분하지 않습니다.");
+    }
+
+    @GetMapping("/project/search/recommend/list")
+    public Response recommendKeyword() {
+        return Response.success(projectService.findRecommendKeywordDtoList());
+    }
+
+    @GetMapping("/project/search/recommend/{keywordId}")
+    public Response selectRecommendKeyword(@PathVariable String keywordId) {
+        KeywordResponseDto keyword = projectService.findKeywordDto(Long.valueOf(keywordId));
+        return Response.success(projectRepository.searchProjectByLatestOrder(keyword.getWord()));
     }
 }

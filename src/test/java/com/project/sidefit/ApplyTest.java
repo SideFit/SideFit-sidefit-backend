@@ -76,6 +76,8 @@ public class ApplyTest {
 
         Image image = new Image("image", "url");
         imageRepository.save(image);
+        applier.updateImage(image);
+        teamLeader.updateImage(image);
 
         Project project = createProject(teamLeader, image);
         projectRepository.save(project);

@@ -71,6 +71,7 @@ public class NotificationDto {
     @NoArgsConstructor
     public static class NotificationQueryDto {
 
+        // notification
         private Long id;
         private Long senderId;
         private Long receiverId;
@@ -79,11 +80,15 @@ public class NotificationDto {
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
 
-        private Long imageId; // sender
-        private String nickname; // sender
+        // image(sender)
+        private Long imageId;
+        private String imageUrl;
+
+        // sender
+        private String nickname;
 
         @QueryProjection
-        public NotificationQueryDto(Long id, Long senderId, Long receiverId, String content, NotificationType type, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String nickname) {
+        public NotificationQueryDto(Long id, Long senderId, Long receiverId, String content, NotificationType type, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String imageUrl, String nickname) {
             this.id = id;
             this.senderId = senderId;
             this.receiverId = receiverId;
@@ -92,6 +97,7 @@ public class NotificationDto {
             this.createdDate = createdDate;
             this.lastModifiedDate = lastModifiedDate;
             this.imageId = imageId;
+            this.imageUrl = imageUrl;
             this.nickname = nickname;
         }
     }
