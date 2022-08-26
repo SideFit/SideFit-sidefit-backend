@@ -1,8 +1,10 @@
 package com.project.sidefit.api.dto;
 
+import com.project.sidefit.domain.entity.Keyword;
 import com.project.sidefit.domain.entity.Project;
 import com.project.sidefit.domain.entity.ProjectUser;
 import com.project.sidefit.domain.entity.Recruit;
+import com.project.sidefit.domain.enums.SearchCondition;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +26,7 @@ public class ProjectDto {
         @NotBlank(message = "제목을 입력해주세요.")
         private String title; // 프로젝트 제목
 
-        @NotNull(message = "프로젝트 타입을 정해주세요.")
+        @NotNull(message = "프로젝트 타입을 설정해주세요.")
         private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
 
         @NotNull(message = "프로젝트 분야를 입력해주세요.")
@@ -60,7 +62,7 @@ public class ProjectDto {
         @NotNull(message = "직군을 입력해주세요.")
         private String jobGroup;
 
-        @NotNull(message = "인원을 정해주세요.")
+        @NotNull(message = "인원을 설정해주세요.")
         private Integer recruitNumber;
     }
 
@@ -72,8 +74,8 @@ public class ProjectDto {
         @NotBlank(message = "검색하려는 키워드를 입력해주세요.")
         private String keyword;
 
-        @NotNull
-        private String query; // 최신순, 조회순..?
+        @NotNull(message = "검색 조건을 설정해주세요.")
+        private SearchCondition condition; // 최신 순, 정확도 순
     }
 
     @Getter
@@ -232,6 +234,19 @@ public class ProjectDto {
             status = project.isStatus();
             createdDate = project.getCreatedDate();
             lastModifiedDate = project.getLastModifiedDate();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class KeywordResponseDto {
+
+        private Long id;
+        private String word;
+
+        public KeywordResponseDto(Keyword keyword) {
+            id = keyword.getId();
+            word = keyword.getWord();
         }
     }
 }

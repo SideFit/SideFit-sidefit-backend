@@ -7,6 +7,7 @@ import com.project.sidefit.domain.repository.ImageRepository;
 import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
+import com.project.sidefit.domain.repository.project.KeywordRepository;
 import com.project.sidefit.domain.repository.project.RecruitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class ProjectService {
     private final ImageRepository imageRepository;
     private final BookmarkRepository bookmarkRepository;
     private final ApplyRepository applyRepository;
+    private final KeywordRepository keywordRepository;
 
     public Long makeProject(Long userId, Long imageId, ProjectRequestDto projectRequestDto) {
         User user = userRepository.getReferenceById(userId);
@@ -41,6 +43,17 @@ public class ProjectService {
             recruitRepository.save(recruit);
         }
         projectUserRepository.save(projectUser);
+
+        String[] hashtags = project.getHashtag().split("#");
+        for (String hashtag : hashtags) {
+            Optional<Keyword> recommendKeywordOptional = keywordRepository.findByWord(hashtag);
+            if (recommendKeywordOptional.isPresent()) {
+                recommendKeywordOptional.get().addCount();
+            } else {
+                Keyword keyword = new Keyword(hashtag, 1);
+                keywordRepository.save(keyword);
+            }
+        }
         return projectRepository.save(project).getId();
     }
 
@@ -113,8 +126,20 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    public List<KeywordResponseDto> findRecommendKeywordDtoList() {
+        return keywordRepository.findTop10OrderByCountDesc().stream()
+                .map(KeywordResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public ProjectResponseDto findProjectDto(Long projectId) {
         return new ProjectResponseDto(findProject(projectId));
+    }
+
+    @Transactional(readOnly = true)
+    public KeywordResponseDto findKeywordDto(Long keywordId) {
+        return new KeywordResponseDto(findKeyword(keywordId));
     }
 
     @Transactional(readOnly = true)
@@ -128,6 +153,12 @@ public class ProjectService {
     private Project findProject(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalStateException("This team is null: " + projectId));
+    }
+
+    @Transactional(readOnly = true)
+    private Keyword findKeyword(Long keywordId) {
+        return keywordRepository.findById(keywordId)
+                .orElseThrow(() -> new IllegalStateException("This keyword is null: " + keywordId));
     }
 
     private Project createProject(ProjectRequestDto projectRequestDto, User user, Image image) {
