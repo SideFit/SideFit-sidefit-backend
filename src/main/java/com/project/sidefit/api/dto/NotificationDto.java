@@ -45,7 +45,6 @@ public class NotificationDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class NotificationResponseDto {
 
         private Long id;

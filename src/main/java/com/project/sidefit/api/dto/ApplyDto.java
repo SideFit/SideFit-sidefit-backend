@@ -34,7 +34,6 @@ public class ApplyDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class ApplyResponseDto {
 
         private Long id;
@@ -60,7 +59,6 @@ public class ApplyDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class ApplyResultDto {
 
         private Long id;
