@@ -118,6 +118,7 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProjectResponseDto {
 
         private Long id;
@@ -157,6 +158,7 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class RecruitResponseDto {
 
         private Long id;
@@ -176,6 +178,7 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProjectUserResponseDto {
 
         private Long id;
@@ -214,6 +217,7 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProjectRecommendDto {
 
         private Long id;
