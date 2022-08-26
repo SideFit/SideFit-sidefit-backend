@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.project.sidefit.domain.entity.QImage.*;
 import static com.project.sidefit.domain.entity.QNotification.*;
 import static com.project.sidefit.api.dto.NotificationDto.*;
 
@@ -31,12 +32,14 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
                         notification.type,
                         notification.createdDate,
                         notification.lastModifiedDate,
-                        sender.image.id,
+                        image.id,
+                        image.imageUrl,
                         sender.nickname
                 ))
                 .from(notification)
                 .join(notification.receiver, receiver)
                 .join(notification.sender, sender)
+                .join(sender.image, image)
                 .where(receiver.id.eq(receiverId))
                 .orderBy(notification.createdDate.desc())
                 .fetch();
