@@ -48,7 +48,7 @@ public class ProjectApiController {
             return Response.failure(-1000, "이미지를 선택해주세요.");
         }
         projectService.updateProject(project.getId(), Long.valueOf(imageId), projectRequestDto);
-        return Response.success(projectService.findProjectDto(project.getId()));
+        return Response.success();
     }
 
     @PatchMapping("/project/end")
