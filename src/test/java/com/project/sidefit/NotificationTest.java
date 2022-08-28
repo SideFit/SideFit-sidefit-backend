@@ -68,9 +68,7 @@ public class NotificationTest {
     @DisplayName("GET /api/sse/connect")
     void connect_test() throws Exception {
         //given
-        User user = User.createUser("user", encoder.encode("pw"), "sender", "job");
-        userRepository.save(user);
-        TokenDto token = signService.login("user", "pw");
+        TokenDto token = signService.login("email1@gmail.com", "pw1");
 
         //when
         ResultActions result = mockMvc.perform(get("/api/sse/connect")
@@ -88,16 +86,13 @@ public class NotificationTest {
     @DisplayName("POST /api/notification/send")
     void sendNotification_test() throws Exception {
         //given
-        Image image = new Image("image", "url");
-        User sender = User.createUser("sender", encoder.encode("pw"), "sender", "job");
-        User receiver = User.createUser("receiver", encoder.encode("pw"), "receiver", "job");
-        imageRepository.save(image);
-        userRepository.save(sender);
-        userRepository.save(receiver);
+        Image image = imageRepository.getReferenceById(1L);
+        User sender = userRepository.getReferenceById(1L);
+        User receiver = userRepository.getReferenceById(2L);
 
         NotificationRequestDto notificationRequestDto = new NotificationRequestDto("test", NotificationType.CHAT);
 
-        TokenDto token = signService.login("sender", "pw");
+        TokenDto token = signService.login(sender.getEmail(), "pw1");
 
         //when
         ResultActions result = mockMvc.perform(post("/api/notification/send")
@@ -131,15 +126,11 @@ public class NotificationTest {
     @DisplayName("GET /api/notification/list")
     void getNotifications_test() throws Exception {
         //given
-        Image image = new Image("image", "url");
-        User sender = User.createUser("sender", encoder.encode("pw"), "sender", "job");
-        User receiver = User.createUser("receiver", encoder.encode("pw"), "receiver", "job");
-        sender.updateImage(image);
-        imageRepository.save(image);
-        userRepository.save(sender);
-        userRepository.save(receiver);
+        Image image = imageRepository.getReferenceById(1L);
+        User sender = userRepository.getReferenceById(1L);
+        User receiver = userRepository.getReferenceById(2L);
 
-        TokenDto token = signService.login("receiver", "pw");
+        TokenDto token = signService.login(receiver.getEmail(), "pw2");
 
         for (int i = 1; i <= 5; i++) {
             NotificationRequestDto dto = new NotificationRequestDto("test" + i, NotificationType.CHAT);
