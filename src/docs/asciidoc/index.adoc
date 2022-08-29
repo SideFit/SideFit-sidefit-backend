@@ -232,9 +232,6 @@ include::{snippets}/get_project_recommend_list/http-response.adoc[]
 include::{snippets}/get_project_recommend_list/curl-request.adoc[]
 
 === 프로젝트 검색
-PathParameters
-
-include::{snippets}/get_project_search/path-parameters.adoc[]
 RequestBody
 include::{snippets}/get_project_search/request-fields.adoc[]
 ResponseBody

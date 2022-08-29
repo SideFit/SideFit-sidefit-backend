@@ -1,16 +1,14 @@
 package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.sidefit.domain.entity.Image;
-import com.project.sidefit.domain.entity.Keyword;
-import com.project.sidefit.domain.entity.ProjectUser;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.*;
 import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.ImageRepository;
 import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.project.KeywordRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
+import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.ProjectService;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.security.SignService;
@@ -57,6 +55,9 @@ public class ProjectTest {
     private SignService signService;
 
     @Autowired
+    private ApplyService applyService;
+
+    @Autowired
     private UserJpaRepo userRepository;
 
     @Autowired
@@ -79,26 +80,11 @@ public class ProjectTest {
     @DisplayName("GET /api/project/{projectId}")
     void get_project_test() throws Exception {
         //given
-        User teamLeader = User.createUser("test@gmail.com", encoder.encode("pw"), "tester", "job");
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("test@gmail.com", "pw");
-
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        Long projectId = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto);
+        Project project = projectRepository.getReferenceById(1L);
 
         //when
-        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/{projectId}", String.valueOf(projectId))
+        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/{projectId}", String.valueOf(project.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-AUTH-TOKEN", token.getAccessToken())
         );
 
         //then
@@ -137,17 +123,13 @@ public class ProjectTest {
     @DisplayName("POST /api/project")
     void create_project_test() throws Exception {
         //given
-        User teamLeader = User.createUser("test@gmail.com", encoder.encode("pw"), "tester", "job");
-        userRepository.save(teamLeader);
+        User teamLeader = userRepository.getReferenceById(1L);
+        TokenDto token = signService.login(teamLeader.getEmail(), "pw1");
+        Image image = imageRepository.getReferenceById(1L);
 
-        TokenDto token = signService.login("test@gmail.com", "pw");
-
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
+        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 3);
         RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
+        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 1);
         List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
 
         ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
@@ -193,27 +175,14 @@ public class ProjectTest {
     @DisplayName("PATCH /api/project/end")
     void end_project_test() throws Exception {
         //given
-        User teamLeader = User.createUser("test@gmail.com", encoder.encode("pw"), "tester", "job");
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("test@gmail.com", "pw");
-
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        Long projectId = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto);
+        TokenDto token = signService.login("email5@gmail.com", "pw5");
+        Project project = projectRepository.getReferenceById(1L);
 
         //when
         ResultActions result = mockMvc.perform(patch("/api/project/end")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
-                .param("projectId", String.valueOf(projectId))
+                .param("projectId", String.valueOf(project.getId()))
         );
 
         //then
@@ -235,27 +204,15 @@ public class ProjectTest {
     @DisplayName("DELETE /api/project/delete")
     void delete_project_test() throws Exception {
         //given
-        User teamLeader = User.createUser("test@gmail.com", encoder.encode("pw"), "tester", "job");
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("test@gmail.com", "pw");
-
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        Long projectId = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto);
+        TokenDto token = signService.login("email5@gmail.com", "pw5");
+        Image image = imageRepository.getReferenceById(1L);
+        Project project = projectRepository.getReferenceById(1L);
 
         //when
         ResultActions result = mockMvc.perform(delete("/api/project/delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
-                .param("projectId", String.valueOf(projectId))
+                .param("projectId", String.valueOf(project.getId()))
         );
 
         //then
@@ -277,32 +234,21 @@ public class ProjectTest {
     @DisplayName("GET /api/project/{projectId}/member/list")
     void project_member_list_test() throws Exception {
         //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
+        User user1 = userRepository.getReferenceById(1L);
+        User user2 = userRepository.getReferenceById(2L);
+        User user3 = userRepository.getReferenceById(3L);
 
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
-        User member1 = User.createUser("m1@gmail.com", encoder.encode("pw"), "tester2", "job");
-        User member2 = User.createUser("m2@gmail.com", encoder.encode("pw"), "tester3", "job");
-        User member3 = User.createUser("m3@gmail.com", encoder.encode("pw"), "tester4", "job");
-        teamLeader.updateImage(image);
-        member1.updateImage(image);
-        member2.updateImage(image);
-        member3.updateImage(image);
-        userRepository.save(teamLeader);
-        userRepository.save(member1);
-        userRepository.save(member2);
-        userRepository.save(member3);
+        Project project = projectRepository.getReferenceById(1L);
 
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        Long projectId = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto);
+        ProjectUser projectUser1 = ProjectUser.createProjectUser(user1, project);
+        ProjectUser projectUser2 = ProjectUser.createProjectUser(user2, project);
+        ProjectUser projectUser3 = ProjectUser.createProjectUser(user3, project);
+        projectUserRepository.save(projectUser1);
+        projectUserRepository.save(projectUser2);
+        projectUserRepository.save(projectUser3);
 
         //when
-        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/{projectId}/member/list", String.valueOf(projectId)));
+        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/{projectId}/member/list", String.valueOf(project.getId())));
 
         //then
         result.andExpect(status().isOk())
@@ -327,54 +273,26 @@ public class ProjectTest {
     @DisplayName("GET /api/project/pre-member/list")
     void project_pre_member_list_test() throws Exception {
         //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
+        User user1 = userRepository.getReferenceById(1L);
+        User user2 = userRepository.getReferenceById(2L);
+        User user3 = userRepository.getReferenceById(3L);
+        User user4 = userRepository.getReferenceById(4L);
 
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "leader", "job");
-        User member1 = User.createUser("m1@gmail.com", encoder.encode("pw"), "tester1", "job");
-        User member2 = User.createUser("m2@gmail.com", encoder.encode("pw"), "tester2", "job");
-        User member3 = User.createUser("m3@gmail.com", encoder.encode("pw"), "tester3", "job");
-        User member4 = User.createUser("m4@gmail.com", encoder.encode("pw"), "tester4", "job");
-        User member5 = User.createUser("m5@gmail.com", encoder.encode("pw"), "tester5", "job");
-        teamLeader.updateImage(image);
-        member1.updateImage(image);
-        member2.updateImage(image);
-        member3.updateImage(image);
-        member4.updateImage(image);
-        member5.updateImage(image);
-        userRepository.save(teamLeader);
-        userRepository.save(member1);
-        userRepository.save(member2);
-        userRepository.save(member3);
-        userRepository.save(member4);
-        userRepository.save(member5);
+        TokenDto token = signService.login("email5@gmail.com", "pw5");
 
-        TokenDto token = signService.login("leader@gmail.com", "pw");
+        Project project1 = projectRepository.getReferenceById(1L);
+        Project project2 = projectRepository.getReferenceById(2L);
 
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList1 = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-        List<RecruitRequestDto> recruitRequestDtoList2 = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), recruitRequestDtoList1);
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 0, "#스포츠", "hi!!", "2 month", "#JavaScript#Vue.js", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), recruitRequestDtoList2);
-        Long projectId1 = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
-        Long projectId2 = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
-
-        // 회원 1,2,3 -> 프로젝트 1 & 회원 4,5 -> 프로젝트 2
-        ProjectUser projectUser1 = ProjectUser.createProjectUser(member1, projectRepository.getReferenceById(projectId1));
-        ProjectUser projectUser2 = ProjectUser.createProjectUser(member2, projectRepository.getReferenceById(projectId1));
-        ProjectUser projectUser3 = ProjectUser.createProjectUser(member3, projectRepository.getReferenceById(projectId1));
-        ProjectUser projectUser4 = ProjectUser.createProjectUser(member4, projectRepository.getReferenceById(projectId2));
-        ProjectUser projectUser5 = ProjectUser.createProjectUser(member5, projectRepository.getReferenceById(projectId2));
+        ProjectUser projectUser1 = ProjectUser.createProjectUser(user1, project1);
+        ProjectUser projectUser2 = ProjectUser.createProjectUser(user2, project1);
+        ProjectUser projectUser3 = ProjectUser.createProjectUser(user3, project2);
+        ProjectUser projectUser4 = ProjectUser.createProjectUser(user4, project2);
         projectUserRepository.save(projectUser1);
         projectUserRepository.save(projectUser2);
         projectUserRepository.save(projectUser3);
         projectUserRepository.save(projectUser4);
-        projectUserRepository.save(projectUser5);
 
-        projectService.endProject(projectId1); // 프로젝트 1 종료 처리
+        projectService.endProject(project1.getId()); // 프로젝트 1 종료 처리
 
         //when
         ResultActions result = mockMvc.perform(get("/api/project/pre-member/list")
@@ -402,25 +320,8 @@ public class ProjectTest {
     @DisplayName("GET /api/project/recommend/list")
     void recommend_projects_test() throws Exception {
         //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
-        User user = User.createUser("user@gmail.com", encoder.encode("pw"), "tester2", "job");
-        teamLeader.updateImage(image);
-        user.updateImage(image);
-        userRepository.save(teamLeader);
-        userRepository.save(user);
-
-        TokenDto token = signService.login("user@gmail.com", "pw");
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        Long projectId = projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto);
+        User user = userRepository.getReferenceById(1L);
+        TokenDto token = signService.login(user.getEmail(), "pw1");
 
         //when
         ResultActions result = mockMvc.perform(get("/api/project/recommend/list")
@@ -451,27 +352,6 @@ public class ProjectTest {
     @DisplayName("GET /api/project/search")
     void search_project_test() throws Exception {
         //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
-        teamLeader.updateImage(image);
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("leader@gmail.com", "pw");
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#hashtag3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
-
         SearchRequestDto searchRequestDto = new SearchRequestDto("test", SearchCondition.LATEST_ORDER);
 
         //when
@@ -513,28 +393,6 @@ public class ProjectTest {
     @WithMockUser
     @DisplayName("GET /api/project/search/recommend/list")
     void recommend_keyword_test() throws Exception {
-        //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
-        teamLeader.updateImage(image);
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("leader@gmail.com", "pw");
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#h1#h2#h3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#h4#h5#h6", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#h7#h8#h9", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
-
         //when
         ResultActions result = mockMvc.perform(get("/api/project/search/recommend/list").contentType(MediaType.APPLICATION_JSON));
 
@@ -555,28 +413,7 @@ public class ProjectTest {
     @DisplayName("GET /api/project/search/recommend/{keywordId}")
     void select_recommend_keyword_test() throws Exception {
         //given
-        Image image = new Image("default-image", "url");
-        imageRepository.save(image);
-
-        User teamLeader = User.createUser("leader@gmail.com", encoder.encode("pw"), "tester1", "job");
-        teamLeader.updateImage(image);
-        userRepository.save(teamLeader);
-
-        TokenDto token = signService.login("leader@gmail.com", "pw");
-
-        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 1);
-        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
-        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 3);
-        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
-
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan1", "#h1#h2#h3", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 1, "#스포츠", "hi!!", "2 month", "#Java#Spring", "plan2", "#h4#h5#h6", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        ProjectRequestDto projectRequestDto3 = new ProjectRequestDto("test3", 2, "#환경", "hi!!!", "3 month", "#Java#Spring", "plan3", "#h7#h8#h9", image.getName(), image.getImageUrl(), recruitRequestDtoList);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto1);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto2);
-        projectService.makeProject(teamLeader.getId(), image.getId(), projectRequestDto3);
-
-        Keyword keyword = keywordRepository.findByWord("h1").get();
+        Keyword keyword = keywordRepository.getReferenceById(1L);
 
         //when
         ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/search/recommend/{keywordId}", keyword.getId())

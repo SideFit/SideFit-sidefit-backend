@@ -69,22 +69,17 @@ public class ApplyTest {
     @DisplayName("POST /api/project/apply")
     void apply_test() throws Exception {
         //given
-        User applier = User.createUser("applier", encoder.encode("pw"), "applier", "job");
-        User teamLeader = User.createUser("teamLeader", encoder.encode("pw"), "teamLeader", "job");
-        userRepository.save(applier);
-        userRepository.save(teamLeader);
+        User applier = userRepository.getReferenceById(1L);
+        User teamLeader = userRepository.getReferenceById(5L);
 
-        Image image = new Image("image", "url");
-        imageRepository.save(image);
+        TokenDto token = signService.login(applier.getEmail(), "pw1");
+
+        Image image = imageRepository.getReferenceById(1L);
         applier.updateImage(image);
         teamLeader.updateImage(image);
 
-        Project project = createProject(teamLeader, image);
-        projectRepository.save(project);
-
+        Project project = projectRepository.getReferenceById(1L);
         ApplyRequestDto applyRequestDto = new ApplyRequestDto("백엔드", "열심히 하겠습니다!");
-
-        TokenDto token = signService.login("applier", "pw");
 
         //when
         ResultActions result = mockMvc.perform(post("/api/project/apply")
@@ -118,20 +113,17 @@ public class ApplyTest {
     @DisplayName("POST /api/project/invite")
     void invite_test() throws Exception {
         //given
-        User user = User.createUser("user", encoder.encode("pw"), "user", "job");
-        User teamLeader = User.createUser("teamLeader", encoder.encode("pw"), "teamLeader", "job");
-        userRepository.save(user);
-        userRepository.save(teamLeader);
+        User user = userRepository.getReferenceById(1L);
+        User teamLeader = userRepository.getReferenceById(5L);
 
-        Image image = new Image("image", "url");
-        imageRepository.save(image);
+        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
 
-        Project project = createProject(teamLeader, image);
-        projectRepository.save(project);
+        Image image = imageRepository.getReferenceById(1L);
+        user.updateImage(image);
+        teamLeader.updateImage(image);
 
+        Project project = projectRepository.getReferenceById(1L);
         InviteRequestDto inviteRequestDto = new InviteRequestDto("프론트엔드");
-
-        TokenDto token = signService.login("teamLeader", "pw");
 
         //when
         ResultActions result = mockMvc.perform(post("/api/project/invite")
@@ -166,21 +158,18 @@ public class ApplyTest {
     @DisplayName("GET /api/project/apply-response")
     void apply_response_test() throws Exception {
         //given
-        User applier = User.createUser("applier", encoder.encode("pw"), "applier", "job");
-        User teamLeader = User.createUser("teamLeader", encoder.encode("pw"), "teamLeader", "job");
-        userRepository.save(applier);
-        userRepository.save(teamLeader);
+        User applier = userRepository.getReferenceById(1L);
+        User teamLeader = userRepository.getReferenceById(5L);
 
-        Image image = new Image("image", "url");
-        imageRepository.save(image);
+        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
 
-        Project project = createProject(teamLeader, image);
-        projectRepository.save(project);
+        Image image = imageRepository.getReferenceById(1L);
+        applier.updateImage(image);
+        teamLeader.updateImage(image);
 
+        Project project = projectRepository.getReferenceById(1L);
         ApplyRequestDto applyRequestDto = new ApplyRequestDto("백엔드", "열심히 하겠습니다");
         Long applyId = applyService.applyToTeam(applier.getId(), project.getId(), applyRequestDto);
-
-        TokenDto token = signService.login("teamLeader", "pw");
 
         //when
         ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/apply-response/{applyId}", String.valueOf(applyId))
@@ -216,21 +205,19 @@ public class ApplyTest {
     @DisplayName("GET /api/project/invite-response")
     void invite_response_test() throws Exception {
         //given
-        User user = User.createUser("user", encoder.encode("pw"), "user", "job");
-        User teamLeader = User.createUser("teamLeader", encoder.encode("pw"), "teamLeader", "job");
-        userRepository.save(user);
-        userRepository.save(teamLeader);
+        User user = userRepository.getReferenceById(1L);
+        User teamLeader = userRepository.getReferenceById(5L);
 
-        Image image = new Image("image", "url");
-        imageRepository.save(image);
+        TokenDto token = signService.login(user.getEmail(), "pw1");
 
-        Project project = createProject(teamLeader, image);
-        projectRepository.save(project);
+        Image image = imageRepository.getReferenceById(1L);
+        user.updateImage(image);
+        teamLeader.updateImage(image);
+
+        Project project = projectRepository.getReferenceById(1L);
 
         InviteRequestDto inviteRequestDto = new InviteRequestDto("프론트엔드");
         Long applyId = applyService.inviteToUser(user.getId(), project.getId(), inviteRequestDto);
-
-        TokenDto token = signService.login("user", "pw");
 
         //when
         ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/invite-response/{applyId}", String.valueOf(applyId))
@@ -259,20 +246,5 @@ public class ApplyTest {
                                 fieldWithPath("result.data.lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
                         )
                 ));
-    }
-
-    private Project createProject(User teamLeader, Image image) {
-        return Project.builder()
-                .user(teamLeader)
-                .image(image)
-                .title("title")
-                .type(0)
-                .field("field")
-                .introduction("hi")
-                .period("1 month")
-                .stack("#Java")
-                .meetingPlan("plan")
-                .hashtag("#test")
-                .build();
     }
 }
