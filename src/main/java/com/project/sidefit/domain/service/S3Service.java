@@ -1,60 +1,107 @@
 package com.project.sidefit.domain.service;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final AmazonS3 amazonS3;
 
-    public String uploadFile(MultipartFile multipartFile) throws IOException {
-        String fileName = multipartFile.getOriginalFilename();
-        String ext = fileName.split("\\.")[1];
-        String contentType = "";
+    @Value("${spring.environment}")
+    private String environment;
 
-        switch (ext) {
-            case "jpeg":
-                contentType = "image/jpeg";
-                break;
-            case "png":
-                contentType = "image/png";
-                break;
-            case "txt":
-                contentType = "text/plain";
-                break;
-            case "csv":
-                contentType = "text/csv";
-                break;
-        }
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
-        }
-        ListObjectsV2Result listObjectsV2Result = amazonS3.listObjectsV2(bucket);
-        List<S3ObjectSummary> objectSummaries = listObjectsV2Result.getObjectSummaries();
+    @Value("${spring.fileDir}")
+    private String rootDir;
 
-        for (S3ObjectSummary object: objectSummaries) {
-            System.out.println("object = " + object.toString());
+    private String fileDir;
+
+    private final AmazonS3Client amazonS3Client;
+
+    @PostConstruct
+    private void init() {
+        if (environment.equals("local")) {
+            this.fileDir = System.getProperty("user.dir") + this.rootDir;
+        } else {
+            this.fileDir = this.rootDir;
         }
-        return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+    public String uploadFiles(MultipartFile multipartFile, String dirName) throws IOException {
+
+        File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
+                .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
+        return upload(uploadFile, dirName);
+    }
+
+    public String upload(File uploadFile, String dirName) {
+        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름
+        String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
+        removeNewFile(uploadFile);
+        return uploadImageUrl;
+    }
+
+    // S3로 업로드
+    private String putS3(File uploadFile, String fileName) {
+        amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
+    // 로컬에 저장된 이미지 지우기
+    private void removeNewFile(File targetFile) {
+        if (targetFile.delete()) {
+            log.info("File delete success");
+            return;
+        }
+        log.info("File delete fail");
+    }
+
+    // 로컬에 파일 업로드 하기
+    private Optional<File> convert(MultipartFile multipartFile) throws IOException {
+
+        if (multipartFile.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // 파일 이름
+        String originalFilename = multipartFile.getOriginalFilename();
+
+        // S3에 저장될 파일이름
+        String storeFileName = createStoreFileName(originalFilename);
+
+        log.info(System.getProperty("user.dir"));
+
+        File convertFile = new File(fileDir + storeFileName);
+        multipartFile.transferTo(convertFile);
+
+        return Optional.of(convertFile);
+    }
+
+    private String createStoreFileName(String originalFilename) {
+        String ext = extractExt(originalFilename);
+        String uuid = UUID.randomUUID().toString();
+        return uuid + "." + ext;
+    }
+
+    private String extractExt(String originalFilename) {
+        int pos = originalFilename.lastIndexOf(".");
+        return originalFilename.substring(pos + 1);
     }
 }
