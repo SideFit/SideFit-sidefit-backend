@@ -192,7 +192,14 @@ include::{snippets}/create_project/http-response.adoc[]
 include::{snippets}/create_project/curl-request.adoc[]
 
 === 프로젝트 수정
+RequestParameters
+include::{snippets}/update_project/request-parameters.adoc[]
+ResponseBody
+include::{snippets}/update_project/response-fields.adoc[]
 
+include::{snippets}/update_project/http-request.adoc[]
+include::{snippets}/update_project/http-response.adoc[]
+include::{snippets}/update_project/curl-request.adoc[]
 
 === 프로젝트 삭제
 RequestParameters
@@ -287,9 +294,6 @@ include::{snippets}/invite_user/http-response.adoc[]
 include::{snippets}/invite_user/curl-request.adoc[]
 
 === 유저 지원 응답
-PathParameters
-
-include::{snippets}/apply_response/path-parameters.adoc[]
 RequestParameters
 include::{snippets}/apply_response/request-parameters.adoc[]
 ResponseBody
@@ -300,9 +304,6 @@ include::{snippets}/apply_response/http-response.adoc[]
 include::{snippets}/apply_response/curl-request.adoc[]
 
 === 팀장 초대 응답
-PathParameters
-
-include::{snippets}/invite_response/path-parameters.adoc[]
 RequestParameters
 include::{snippets}/invite_response/request-parameters.adoc[]
 ResponseBody
