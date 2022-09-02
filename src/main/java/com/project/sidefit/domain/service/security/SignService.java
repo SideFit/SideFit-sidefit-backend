@@ -16,6 +16,7 @@ import com.project.sidefit.domain.repository.UserPrevJpaRepo;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.mail.MailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SignService {
 
+    @Value("${spring.url}")
+    private String url;
 
     private final UserJpaRepo userJpaRepo;
     private final MailService mailService;
@@ -79,8 +82,8 @@ public class SignService {
 
         // ~~~/uuid 형태
         // TODO EC2 퍼블릭 ip: http://3.39.135.44:8080/ >> url prefix 변수 생성해서 yml 파일로부터 운영환경에 따른 자동 설정되도록 변경
-        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
-//        mailMessage.setText("http://3.39.135.44:8080/api/auth/confirm-email/" + confirmationToken.getToken());
+//        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
+        mailMessage.setText(url + confirmationToken.getToken());
 
         mailService.sendMail(mailMessage);
     }
@@ -97,8 +100,8 @@ public class SignService {
         mailMessage.setSubject("sidefit 회원가입 이메일 인증");
 
         // TODO http://3.39.135.44:8080/
-        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
-//        mailMessage.setText("http://3.39.135.44:8080/api/auth/confirm-email/" + confirmationToken.getToken());
+//        mailMessage.setText("http://localhost:8080/api/auth/confirm-email/" + confirmationToken.getToken());
+        mailMessage.setText(url + confirmationToken.getToken());
         mailService.sendMail(mailMessage);
     }
 
