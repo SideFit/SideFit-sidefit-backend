@@ -132,7 +132,7 @@ public class ProjectTest {
         RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 1);
         List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
 
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), image.getImageUrl(), recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto = new ProjectRequestDto("test", 0, "#웰빙", "hi!", "1 month", "#Java#Spring", "plan", "#hashtag", image.getName(), null, recruitRequestDtoList);
 
         //when
         ResultActions result = mockMvc.perform(post("/api/project")
@@ -161,6 +161,47 @@ public class ProjectTest {
                                 fieldWithPath("imageUrl").description("이미지 url"),
                                 fieldWithPath("recruits[].jobGroup").description("직군"),
                                 fieldWithPath("recruits[].recruitNumber").description("모집 인원")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data").type(NUMBER).description("프로젝트 id")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("PATCH /api/project")
+    void update_project_test() throws Exception {
+        //given
+        User teamLeader = userRepository.getReferenceById(5L);
+        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
+        Image image = imageRepository.getReferenceById(1L);
+        Project project = projectRepository.getReferenceById(1L);
+
+        RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 3);
+        RecruitRequestDto recruitRequestDto2 = new RecruitRequestDto("백엔드", 2);
+        RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 1);
+        List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
+
+        ProjectRequestDto projectRequestDto = new ProjectRequestDto("update", 2, "#게임", "hi!!!", "3 month", "#Java", "update plan", "#update", image.getName(), null, recruitRequestDtoList);
+
+        //when
+        ResultActions result = mockMvc.perform(patch("/api/project")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-AUTH-TOKEN", token.getAccessToken())
+                .param("projectId", String.valueOf(project.getId()))
+                .param("imageId", String.valueOf(image.getId()))
+                .content(objectMapper.writeValueAsString(projectRequestDto))
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("update_project",
+                        requestParameters(
+                                parameterWithName("projectId").description("프로젝트 id"),
+                                parameterWithName("imageId").description("이미지 id")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
@@ -201,7 +242,7 @@ public class ProjectTest {
 
     @Test
     @WithMockUser
-    @DisplayName("DELETE /api/project/delete")
+    @DisplayName("DELETE /api/project")
     void delete_project_test() throws Exception {
         //given
         TokenDto token = signService.login("email5@gmail.com", "pw5");
@@ -209,7 +250,7 @@ public class ProjectTest {
         Project project = projectRepository.getReferenceById(1L);
 
         //when
-        ResultActions result = mockMvc.perform(delete("/api/project/delete")
+        ResultActions result = mockMvc.perform(delete("/api/project")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
                 .param("projectId", String.valueOf(project.getId()))
