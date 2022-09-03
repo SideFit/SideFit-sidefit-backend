@@ -241,8 +241,38 @@ public class ProjectDto {
         }
     }
 
+    // TODO: plan A or B ??
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ApplyProjectDto {
+
+        private Long id;
+        private String title;
+        private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
+        private String field;
+        private String period;
+        private LocalDateTime createdDate;
+        private LocalDateTime lastModifiedDate;
+        private List<RecruitResponseDto> recruits;
+
+        public ApplyProjectDto(Project project) {
+            id = project.getId();
+            title = project.getTitle();
+            type = project.getType();
+            field = project.getField();
+            period = project.getPeriod();
+            createdDate = project.getCreatedDate();
+            lastModifiedDate = project.getLastModifiedDate();
+            recruits = project.getRecruits().stream()
+                    .map(RecruitResponseDto::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class KeywordResponseDto {
 
         private Long id;

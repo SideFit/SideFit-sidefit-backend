@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.project.sidefit.api.dto.ApplyDto.*;
 import static com.project.sidefit.api.dto.NotificationDto.*;
+import static com.project.sidefit.api.dto.ProjectDto.*;
 
 @Service
 @Transactional
@@ -150,6 +151,18 @@ public class ApplyService {
     public List<ApplyResponseDto> findApplyDtoList() {
         return applyRepository.findAll().stream()
                 .map(ApplyResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApplyProjectDto> findApplyProjectDtoWithUser(Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        List<Project> projects = applyRepository.findByUser(user).stream()
+                .map(Apply::getProject)
+                .collect(Collectors.toList());
+
+        return projects.stream()
+                .map(ApplyProjectDto::new)
                 .collect(Collectors.toList());
     }
 

@@ -60,7 +60,6 @@ public class ProjectService {
         return project.getId();
     }
 
-    // TODO: 어떤 필드를 수정하는지?
     public void updateProject(Long projectId, Long imageId, ProjectRequestDto projectRequestDto) {
         Project project = findProject(projectId);
         if (!project.isStatus()) {
@@ -186,7 +185,7 @@ public class ProjectService {
      */
     private Image selectOrSaveImage(Long imageId, ProjectRequestDto projectRequestDto) {
         Image image;
-        if (projectRequestDto.getImageUrl().isEmpty()) {
+        if (projectRequestDto.getImageUrl() == null) {
             image = imageRepository.getReferenceById(imageId);
         } else {
             image = new Image(projectRequestDto.getName(), projectRequestDto.getImageUrl());

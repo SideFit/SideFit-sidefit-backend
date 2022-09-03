@@ -17,8 +17,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -97,13 +95,13 @@ public class ApplyTest {
                                 parameterWithName("projectId").description("프로젝트 id")
                         ),
                         requestFields(
-                                fieldWithPath("jobGroup").type(JsonFieldType.STRING).description("직군"),
-                                fieldWithPath("comment").type(JsonFieldType.STRING).description("한마디")
+                                fieldWithPath("jobGroup").type(STRING).description("직군"),
+                                fieldWithPath("comment").type(STRING).description("한마디")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
                                 fieldWithPath("code").type(NUMBER).description("상태 코드"),
-                                fieldWithPath("result").type(NULL).description("결과 메시지")
+                                fieldWithPath("result.data").type(NUMBER).description("지원 id")
                         )
                 ));
     }
@@ -143,19 +141,19 @@ public class ApplyTest {
                                 parameterWithName("projectId").description("프로젝트 id")
                         ),
                         requestFields(
-                                fieldWithPath("jobGroup").type(JsonFieldType.STRING).description("직군")
+                                fieldWithPath("jobGroup").type(STRING).description("직군")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
                                 fieldWithPath("code").type(NUMBER).description("상태 코드"),
-                                fieldWithPath("result").type(NULL).description("결과 메시지")
+                                fieldWithPath("result.data").type(NUMBER).description("초대 id")
                         )
                 ));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("GET /api/project/apply-response")
+    @DisplayName("POST /api/project/apply-response")
     void apply_response_test() throws Exception {
         //given
         User applier = userRepository.getReferenceById(1L);
@@ -172,37 +170,31 @@ public class ApplyTest {
         Long applyId = applyService.applyToTeam(applier.getId(), project.getId(), applyRequestDto);
 
         //when
-        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/apply-response/{applyId}", String.valueOf(applyId))
+        ResultActions result = mockMvc.perform(post("/api/project/apply-response")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
+                .param("applyId", String.valueOf(applyId))
                 .param("flag", "TRUE")
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("apply_response",
-                        pathParameters(
-                                parameterWithName("applyId").description("지원 id")
-                        ),
                         requestParameters(
+                                parameterWithName("applyId").description("지원 id"),
                                 parameterWithName("flag").description("수락, 거절 여부")
                         ),
                         responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("result.data.id").type(JsonFieldType.NUMBER).description("지원 id"),
-                                fieldWithPath("result.data.userId").type(JsonFieldType.NUMBER).description("유저 id"),
-                                fieldWithPath("result.data.projectId").type(JsonFieldType.NUMBER).description("프로젝트 id"),
-                                fieldWithPath("result.data.status").type(JsonFieldType.NUMBER).description("지원 상태"),
-                                fieldWithPath("result.data.createdDate").type(JsonFieldType.STRING).description("생성 일자"),
-                                fieldWithPath("result.data.lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("결과 코드"),
+                                fieldWithPath("result").type(NULL).description("결과 메세지")
                         )
                 ));
     }
 
     @Test
     @WithMockUser
-    @DisplayName("GET /api/project/invite-response")
+    @DisplayName("POST /api/project/invite-response")
     void invite_response_test() throws Exception {
         //given
         User user = userRepository.getReferenceById(1L);
@@ -220,30 +212,24 @@ public class ApplyTest {
         Long applyId = applyService.inviteToUser(user.getId(), project.getId(), inviteRequestDto);
 
         //when
-        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/project/invite-response/{applyId}", String.valueOf(applyId))
+        ResultActions result = mockMvc.perform(post("/api/project/invite-response")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-AUTH-TOKEN", token.getAccessToken())
+                .param("applyId", String.valueOf(applyId))
                 .param("flag", "TRUE")
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("invite_response",
-                        pathParameters(
-                                parameterWithName("applyId").description("지원 id")
-                        ),
                         requestParameters(
+                                parameterWithName("applyId").description("초대 id"),
                                 parameterWithName("flag").description("수락, 거절 여부")
                         ),
                         responseFields(
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("result.data.id").type(JsonFieldType.NUMBER).description("초대 id"),
-                                fieldWithPath("result.data.userId").type(JsonFieldType.NUMBER).description("유저 id"),
-                                fieldWithPath("result.data.projectId").type(JsonFieldType.NUMBER).description("프로젝트 id"),
-                                fieldWithPath("result.data.status").type(JsonFieldType.NUMBER).description("초대 상태"),
-                                fieldWithPath("result.data.createdDate").type(JsonFieldType.STRING).description("생성 일자"),
-                                fieldWithPath("result.data.lastModifiedDate").type(JsonFieldType.STRING).description("수정 일자")
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("결과 코드"),
+                                fieldWithPath("result").type(NULL).description("결과 메세지")
                         )
                 ));
     }
