@@ -8,10 +8,10 @@ import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.project.KeywordRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
-import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.ProjectService;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.security.SignService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ProjectTest {
 
     @Autowired
@@ -53,9 +55,6 @@ public class ProjectTest {
 
     @Autowired
     private SignService signService;
-
-    @Autowired
-    private ApplyService applyService;
 
     @Autowired
     private UserJpaRepo userRepository;
@@ -74,6 +73,31 @@ public class ProjectTest {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @BeforeEach
+    void beforeEach() {
+        User leader = User.createUser("leader@gmail.com", encoder.encode("pw"), "leader", "leader");
+        User user1 = User.createUser("user1@gmail.com", encoder.encode("pw1"), "user1", "user");
+        User user2 = User.createUser("user2@gmail.com", encoder.encode("pw2"), "user2", "user");
+        User user3 = User.createUser("user3@gmail.com", encoder.encode("pw3"), "user3", "user");
+        userRepository.save(leader);
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Image image = new Image("test-image", "image-url");
+        imageRepository.save(image);
+
+        RecruitRequestDto recruitDto1 = new RecruitRequestDto("백엔드", 3);
+        RecruitRequestDto recruitDto2 = new RecruitRequestDto("프론트엔드", 2);
+        RecruitRequestDto recruitDto3 = new RecruitRequestDto("백엔드", 1);
+        RecruitRequestDto recruitDto4 = new RecruitRequestDto("프론트엔드", 2);
+
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 1, "#스포츠", "This is test project", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), List.of(recruitDto1, recruitDto2));
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 2, "#웰빙", "This is test project", "2 month", "#JavaScript#NodeJs", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), List.of(recruitDto3, recruitDto4));
+        projectService.makeProject(leader.getId(), image.getId(), projectRequestDto1);
+        projectService.makeProject(leader.getId(), image.getId(), projectRequestDto2);
+    }
 
     @Test
     @WithMockUser
@@ -123,8 +147,7 @@ public class ProjectTest {
     @DisplayName("POST /api/project")
     void create_project_test() throws Exception {
         //given
-        User teamLeader = userRepository.getReferenceById(1L);
-        TokenDto token = signService.login(teamLeader.getEmail(), "pw1");
+        TokenDto token = signService.login("leader@gmail.com", "pw");
         Image image = imageRepository.getReferenceById(1L);
 
         RecruitRequestDto recruitRequestDto1 = new RecruitRequestDto("프론트엔드", 3);
@@ -175,8 +198,7 @@ public class ProjectTest {
     @DisplayName("PATCH /api/project")
     void update_project_test() throws Exception {
         //given
-        User teamLeader = userRepository.getReferenceById(5L);
-        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
+        TokenDto token = signService.login("leader@gmail.com", "pw");
         Image image = imageRepository.getReferenceById(1L);
         Project project = projectRepository.getReferenceById(1L);
 
@@ -185,7 +207,7 @@ public class ProjectTest {
         RecruitRequestDto recruitRequestDto3 = new RecruitRequestDto("디자이너", 1);
         List<RecruitRequestDto> recruitRequestDtoList = Arrays.asList(recruitRequestDto1, recruitRequestDto2, recruitRequestDto3);
 
-        ProjectRequestDto projectRequestDto = new ProjectRequestDto("update", 2, "#게임", "hi!!!", "3 month", "#Java", "update plan", "#update", image.getName(), null, recruitRequestDtoList);
+        ProjectRequestDto projectRequestDto = new ProjectRequestDto("update", 2, "#게임", "hi!!!", "3 month", "#Java", "new-plan", "#update", image.getName(), null, recruitRequestDtoList);
 
         //when
         ResultActions result = mockMvc.perform(patch("/api/project")
@@ -216,7 +238,7 @@ public class ProjectTest {
     @DisplayName("PATCH /api/project/end")
     void end_project_test() throws Exception {
         //given
-        TokenDto token = signService.login("email5@gmail.com", "pw5");
+        TokenDto token = signService.login("leader@gmail.com", "pw");
         Project project = projectRepository.getReferenceById(1L);
 
         //when
@@ -245,8 +267,7 @@ public class ProjectTest {
     @DisplayName("DELETE /api/project")
     void delete_project_test() throws Exception {
         //given
-        TokenDto token = signService.login("email5@gmail.com", "pw5");
-        Image image = imageRepository.getReferenceById(1L);
+        TokenDto token = signService.login("leader@gmail.com", "pw");
         Project project = projectRepository.getReferenceById(1L);
 
         //when
@@ -275,9 +296,14 @@ public class ProjectTest {
     @DisplayName("GET /api/project/{projectId}/member/list")
     void project_member_list_test() throws Exception {
         //given
-        User user1 = userRepository.getReferenceById(1L);
-        User user2 = userRepository.getReferenceById(2L);
-        User user3 = userRepository.getReferenceById(3L);
+        User user1 = userRepository.getReferenceById(2L);
+        User user2 = userRepository.getReferenceById(3L);
+        User user3 = userRepository.getReferenceById(4L);
+
+        Image image = imageRepository.getReferenceById(1L);
+        user1.updateImage(image);
+        user2.updateImage(image);
+        user3.updateImage(image);
 
         Project project = projectRepository.getReferenceById(1L);
 
@@ -314,12 +340,16 @@ public class ProjectTest {
     @DisplayName("GET /api/project/pre-member/list")
     void project_pre_member_list_test() throws Exception {
         //given
-        User user1 = userRepository.getReferenceById(1L);
-        User user2 = userRepository.getReferenceById(2L);
-        User user3 = userRepository.getReferenceById(3L);
-        User user4 = userRepository.getReferenceById(4L);
+        User user1 = userRepository.getReferenceById(2L);
+        User user2 = userRepository.getReferenceById(3L);
+        User user3 = userRepository.getReferenceById(4L);
 
-        TokenDto token = signService.login("email5@gmail.com", "pw5");
+        Image image = imageRepository.getReferenceById(1L);
+        user1.updateImage(image);
+        user2.updateImage(image);
+        user3.updateImage(image);
+
+        TokenDto token = signService.login("leader@gmail.com", "pw");
 
         Project project1 = projectRepository.getReferenceById(1L);
         Project project2 = projectRepository.getReferenceById(2L);
@@ -327,13 +357,11 @@ public class ProjectTest {
         ProjectUser projectUser1 = ProjectUser.createProjectUser(user1, project1);
         ProjectUser projectUser2 = ProjectUser.createProjectUser(user2, project1);
         ProjectUser projectUser3 = ProjectUser.createProjectUser(user3, project2);
-        ProjectUser projectUser4 = ProjectUser.createProjectUser(user4, project2);
         projectUserRepository.save(projectUser1);
         projectUserRepository.save(projectUser2);
         projectUserRepository.save(projectUser3);
-        projectUserRepository.save(projectUser4);
 
-        projectService.endProject(project1.getId()); // 프로젝트 1 종료 처리
+        projectService.endProject(project1.getId()); // 프로젝트 1 종료 처리 -> 이전 멤버로 조회 가능
 
         //when
         ResultActions result = mockMvc.perform(get("/api/project/pre-member/list")
@@ -361,8 +389,7 @@ public class ProjectTest {
     @DisplayName("GET /api/project/recommend/list")
     void recommend_projects_test() throws Exception {
         //given
-        User user = userRepository.getReferenceById(1L);
-        TokenDto token = signService.login(user.getEmail(), "pw1");
+        TokenDto token = signService.login("user1@gmail.com", "pw1");
 
         //when
         ResultActions result = mockMvc.perform(get("/api/project/recommend/list")
@@ -486,5 +513,21 @@ public class ProjectTest {
                                 fieldWithPath("result.data[].recruits[].recruitNumber").type(NUMBER).description("모집 인원")
                         )
                 ));
+    }
+
+    private Project createProject(User leader, Image image, String title, int type, String field, String introduction, String period, String stack, String meetingPlan, String hashtag, boolean status) {
+        return Project.builder()
+                .user(leader)
+                .image(image)
+                .title(title)
+                .type(type)
+                .field(field)
+                .introduction(introduction)
+                .period(period)
+                .stack(stack)
+                .meetingPlan(meetingPlan)
+                .hashtag(hashtag)
+                .status(status)
+                .build();
     }
 }
