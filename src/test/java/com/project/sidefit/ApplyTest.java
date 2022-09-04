@@ -10,6 +10,7 @@ import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.security.SignService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ApplyTest {
 
     @Autowired
@@ -62,19 +65,28 @@ public class ApplyTest {
     @Autowired
     private PasswordEncoder encoder;
 
+    @BeforeEach
+    void beforeEach() {
+        User applier = User.createUser("applier@gmail.com", encoder.encode("pw1"), "applier", "applier");
+        User leader = User.createUser("leader@gmail.com", encoder.encode("pw2"), "leader", "leader");
+        userRepository.save(applier);
+        userRepository.save(leader);
+
+        Image image = new Image("test-image", "image-url");
+        imageRepository.save(image);
+
+        Project project = createProject(leader, image, "test", 0, "#스포츠", "This is test project", "1 month", "#Java#Spring", "plan", "#hashtag", true);
+        projectRepository.save(project);
+    }
+
     @Test
     @WithMockUser
     @DisplayName("POST /api/project/apply")
     void apply_test() throws Exception {
         //given
         User applier = userRepository.getReferenceById(1L);
-        User teamLeader = userRepository.getReferenceById(5L);
-
-        TokenDto token = signService.login(applier.getEmail(), "pw1");
-
-        Image image = imageRepository.getReferenceById(1L);
-        applier.updateImage(image);
-        teamLeader.updateImage(image);
+        User leader = userRepository.getReferenceById(2L);
+        TokenDto token = signService.login("applier@gmail.com", "pw1");
 
         Project project = projectRepository.getReferenceById(1L);
         ApplyRequestDto applyRequestDto = new ApplyRequestDto("백엔드", "열심히 하겠습니다!");
@@ -112,13 +124,8 @@ public class ApplyTest {
     void invite_test() throws Exception {
         //given
         User user = userRepository.getReferenceById(1L);
-        User teamLeader = userRepository.getReferenceById(5L);
-
-        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
-
-        Image image = imageRepository.getReferenceById(1L);
-        user.updateImage(image);
-        teamLeader.updateImage(image);
+        User leader = userRepository.getReferenceById(2L);
+        TokenDto token = signService.login("leader@gmail.com", "pw2");
 
         Project project = projectRepository.getReferenceById(1L);
         InviteRequestDto inviteRequestDto = new InviteRequestDto("프론트엔드");
@@ -157,13 +164,8 @@ public class ApplyTest {
     void apply_response_test() throws Exception {
         //given
         User applier = userRepository.getReferenceById(1L);
-        User teamLeader = userRepository.getReferenceById(5L);
-
-        TokenDto token = signService.login(teamLeader.getEmail(), "pw5");
-
-        Image image = imageRepository.getReferenceById(1L);
-        applier.updateImage(image);
-        teamLeader.updateImage(image);
+        User leader = userRepository.getReferenceById(2L);
+        TokenDto token = signService.login("leader@gmail.com", "pw2");
 
         Project project = projectRepository.getReferenceById(1L);
         ApplyRequestDto applyRequestDto = new ApplyRequestDto("백엔드", "열심히 하겠습니다");
@@ -197,19 +199,13 @@ public class ApplyTest {
     @DisplayName("POST /api/project/invite-response")
     void invite_response_test() throws Exception {
         //given
-        User user = userRepository.getReferenceById(1L);
-        User teamLeader = userRepository.getReferenceById(5L);
-
-        TokenDto token = signService.login(user.getEmail(), "pw1");
-
-        Image image = imageRepository.getReferenceById(1L);
-        user.updateImage(image);
-        teamLeader.updateImage(image);
+        User applier = userRepository.getReferenceById(1L);
+        User leader = userRepository.getReferenceById(2L);
+        TokenDto token = signService.login("applier@gmail.com", "pw1");
 
         Project project = projectRepository.getReferenceById(1L);
-
         InviteRequestDto inviteRequestDto = new InviteRequestDto("프론트엔드");
-        Long applyId = applyService.inviteToUser(user.getId(), project.getId(), inviteRequestDto);
+        Long applyId = applyService.inviteToUser(applier.getId(), project.getId(), inviteRequestDto);
 
         //when
         ResultActions result = mockMvc.perform(post("/api/project/invite-response")
@@ -232,5 +228,21 @@ public class ApplyTest {
                                 fieldWithPath("result").type(NULL).description("결과 메세지")
                         )
                 ));
+    }
+
+    private Project createProject(User leader, Image image, String title, int type, String field, String introduction, String period, String stack, String meetingPlan, String hashtag, boolean status) {
+        return Project.builder()
+                .user(leader)
+                .image(image)
+                .title(title)
+                .type(type)
+                .field(field)
+                .introduction(introduction)
+                .period(period)
+                .stack(stack)
+                .meetingPlan(meetingPlan)
+                .hashtag(hashtag)
+                .status(status)
+                .build();
     }
 }

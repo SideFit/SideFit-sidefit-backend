@@ -10,6 +10,7 @@ import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.notification.NotificationService;
 import com.project.sidefit.domain.service.security.SignService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,9 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NotificationTest {
 
     @Autowired
@@ -52,10 +54,10 @@ public class NotificationTest {
     private SignService signService;
 
     @Autowired
-    private ImageRepository imageRepository;
+    private UserJpaRepo userRepository;
 
     @Autowired
-    private UserJpaRepo userRepository;
+    private ImageRepository imageRepository;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -63,12 +65,24 @@ public class NotificationTest {
     @Autowired
     private PasswordEncoder encoder;
 
+    @BeforeEach
+    void beforeEach() {
+        User sender = User.createUser("sender@gmail.com", encoder.encode("pw1"), "sender", "sender");
+        User receiver = User.createUser("receiver@gmail.com", encoder.encode("pw2"), "receiver", "receiver");
+        userRepository.save(sender);
+        userRepository.save(receiver);
+
+        Image image = new Image("test-image", "image-url");
+        sender.updateImage(image);
+        imageRepository.save(image);
+    }
+
     @Test
     @WithMockUser
     @DisplayName("GET /api/sse/connect")
     void connect_test() throws Exception {
         //given
-        TokenDto token = signService.login("email1@gmail.com", "pw1");
+        TokenDto token = signService.login("receiver@gmail.com", "pw2");
 
         //when
         ResultActions result = mockMvc.perform(get("/api/sse/connect")
@@ -86,13 +100,9 @@ public class NotificationTest {
     @DisplayName("POST /api/notification/send")
     void sendNotification_test() throws Exception {
         //given
-        Image image = imageRepository.getReferenceById(1L);
-        User sender = userRepository.getReferenceById(1L);
         User receiver = userRepository.getReferenceById(2L);
-
         NotificationRequestDto notificationRequestDto = new NotificationRequestDto("test", NotificationType.CHAT);
-
-        TokenDto token = signService.login(sender.getEmail(), "pw1");
+        TokenDto token = signService.login("sender@gmail.com", "pw1");
 
         //when
         ResultActions result = mockMvc.perform(post("/api/notification/send")
@@ -126,15 +136,13 @@ public class NotificationTest {
     @DisplayName("GET /api/notification/list")
     void getNotifications_test() throws Exception {
         //given
-        Image image = imageRepository.getReferenceById(1L);
         User sender = userRepository.getReferenceById(1L);
         User receiver = userRepository.getReferenceById(2L);
-
-        TokenDto token = signService.login(receiver.getEmail(), "pw2");
+        TokenDto token = signService.login("receiver@gmail.com", "pw2");
 
         for (int i = 1; i <= 5; i++) {
-            NotificationRequestDto dto = new NotificationRequestDto("test" + i, NotificationType.CHAT);
-            notificationService.sendNotification(dto, sender.getId(), receiver.getId());
+            NotificationRequestDto notificationDto = new NotificationRequestDto("test" + i, NotificationType.CHAT);
+            notificationService.sendNotification(notificationDto, sender.getId(), receiver.getId());
             Thread.sleep(10);
         }
 
