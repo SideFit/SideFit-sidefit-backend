@@ -70,6 +70,10 @@ tasks.named('asciidoctor') {
 	dependsOn test
 }
 
+test.onlyIf {
+	!project.hasProperty('test')
+}
+
 task copyDocument(type: Copy) {
 	dependsOn asciidoctor
 
