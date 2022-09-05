@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.project.sidefit.api.dto.NotificationDto.*;
 
 @RestController
@@ -39,5 +42,10 @@ public class NotificationApiController {
     @GetMapping("/notification/list")
     public Response getNotifications(@AuthenticationPrincipal User user) {
         return Response.success(notificationRepository.findNotificationsWithReceiverId(user.getId()));
+    }
+
+    @GetMapping("/notification/simple")
+    public Response getSimpleNotifications(@AuthenticationPrincipal User user) {
+        return Response.success(notificationService.findCountAndImageUrlWithReceiverId(user.getId()));
     }
 }

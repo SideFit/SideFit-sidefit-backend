@@ -4,6 +4,7 @@ import com.project.sidefit.domain.entity.Notification;
 import com.project.sidefit.domain.enums.NotificationType;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -53,6 +54,7 @@ public class NotificationDto {
         private Long receiverId;
         private String content;
         private NotificationType type; // CHAT, PERSONAL
+        private Boolean isChecked;
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
 
@@ -62,9 +64,21 @@ public class NotificationDto {
             receiverId = notification.getReceiver().getId();
             content = notification.getContent();
             type = notification.getType();
+            isChecked = notification.isChecked();
             createdDate = notification.getCreatedDate();
             lastModifiedDate = notification.getLastModifiedDate();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NotificationSimpleDto {
+
+        private Long receiverId;
+        private String imageUrl;
+        private Integer count;
     }
 
     @Getter
