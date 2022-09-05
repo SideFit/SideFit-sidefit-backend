@@ -163,11 +163,49 @@ public class NotificationTest {
                                 fieldWithPath("result.data[].receiverId").type(NUMBER).description("수신자 id"),
                                 fieldWithPath("result.data[].content").type(STRING).description("알림 내용"),
                                 fieldWithPath("result.data[].type").type(STRING).description("알림 타입"),
+                                fieldWithPath("result.data[].isChecked").type(BOOLEAN).description("읽음 여부"),
                                 fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
                                 fieldWithPath("result.data[].lastModifiedDate").type(STRING).description("수정 일자"),
+                                fieldWithPath("result.data[].nickname").type(STRING).description("송신자 닉네임"),
                                 fieldWithPath("result.data[].imageId").type(NUMBER).description("송신자 이미지 id"),
-                                fieldWithPath("result.data[].imageUrl").type(STRING).description("송신자 이미지 url"),
-                                fieldWithPath("result.data[].nickname").type(STRING).description("송신자 닉네임")
+                                fieldWithPath("result.data[].imageUrl").type(STRING).description("송신자 이미지 url")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("GET /api/notification/simple")
+    void getSimpleNotifications_test() throws Exception {
+        //given
+        User sender = userRepository.getReferenceById(1L);
+        User receiver = userRepository.getReferenceById(2L);
+        TokenDto token = signService.login("receiver@gmail.com", "pw2");
+
+        Image image = imageRepository.getReferenceById(1L);
+        receiver.updateImage(image);
+
+        for (int i = 1; i <= 5; i++) {
+            NotificationRequestDto notificationDto = new NotificationRequestDto("test" + i, NotificationType.CHAT);
+            notificationService.sendNotification(notificationDto, sender.getId(), receiver.getId());
+            Thread.sleep(10);
+        }
+
+        //when
+        ResultActions result = mockMvc.perform(get("/api/notification/simple")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-AUTH-TOKEN", token.getAccessToken())
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("get_simple_notifications",
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("결과 코드"),
+                                fieldWithPath("result.data.receiverId").type(NUMBER).description("수신자 id"),
+                                fieldWithPath("result.data.imageUrl").type(STRING).description("수신자 이미지 url"),
+                                fieldWithPath("result.data.count").type(NUMBER).description("미확인 알림 갯수")
                         )
                 ));
     }
