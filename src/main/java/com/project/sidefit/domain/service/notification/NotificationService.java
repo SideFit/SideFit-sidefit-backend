@@ -69,6 +69,13 @@ public class NotificationService {
         return notificationRepository.save(notification).getId();
     }
 
+    public void checkAll(List<Long> notificationIds) {
+        for (Long notificationId : notificationIds) {
+            Notification notification = findNotification(notificationId);
+            notification.check();
+        }
+    }
+
     @Transactional(readOnly = true)
     public NotificationResponseDto findNotificationDto(Long notificationId) {
         return new NotificationResponseDto(findNotification(notificationId));

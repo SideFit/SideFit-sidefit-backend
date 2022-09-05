@@ -41,7 +41,11 @@ public class NotificationApiController {
 
     @GetMapping("/notification/list")
     public Response getNotifications(@AuthenticationPrincipal User user) {
-        return Response.success(notificationRepository.findNotificationsWithReceiverId(user.getId()));
+        List<NotificationQueryDto> notifications = notificationRepository.findNotificationsWithReceiverId(user.getId());
+        List<Long> notificationIds = notifications.stream().map(NotificationQueryDto::getId).collect(Collectors.toList());
+        notificationService.checkAll(notificationIds);
+
+        return Response.success(notifications);
     }
 
     @GetMapping("/notification/simple")

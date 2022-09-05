@@ -30,11 +30,12 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
                         receiver.id,
                         notification.content,
                         notification.type,
+                        notification.isChecked,
                         notification.createdDate,
                         notification.lastModifiedDate,
+                        sender.nickname,
                         image.id,
-                        image.imageUrl,
-                        sender.nickname
+                        image.imageUrl
                 ))
                 .from(notification)
                 .join(notification.receiver, receiver)
