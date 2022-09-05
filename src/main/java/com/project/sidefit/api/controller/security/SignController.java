@@ -25,7 +25,7 @@ public class SignController {
     /**
      * 이메일 중복 확인
      */
-    @GetMapping("/email/check")
+    @PostMapping("/email/check")
     public Response checkEmailDuplicate(@RequestBody EmailRequestDto emailRequestDto) {
         if (signService.validateDuplicatedEmail(emailRequestDto.getEmail())) {
             // TODO 상태코드 번호 정하기, 현재 임시로 -1000 사용
@@ -100,7 +100,7 @@ public class SignController {
     /**
      * 이메일 인증여부 확인
      */
-    @GetMapping("/email/auth/check")
+    @PostMapping("/email/auth/check")
     public Response checkEmailAuth(@RequestBody EmailRequestDto emailRequestDto) {
         if (signService.checkEmailAuth(emailRequestDto.getEmail())) {
             return Response.success();
@@ -126,7 +126,7 @@ public class SignController {
     /**
      * 닉네임 중복 체크 api
      */
-    @GetMapping("/nickname/check")
+    @PostMapping("/nickname/check")
     public Response checkNicknameDuplicate(@RequestBody NicknameRequestDto nicknameRequestDto) {
 
         if (signService.validateDuplicatedNickname(nicknameRequestDto.getNickname())) {

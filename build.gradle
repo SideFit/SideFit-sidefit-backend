@@ -70,9 +70,10 @@ tasks.named('asciidoctor') {
 	dependsOn test
 }
 
-test.onlyIf {
-	!project.hasProperty('test')
-}
+// 빌드시 테스트 제외
+//test.onlyIf {
+//	!project.hasProperty('test')
+//}
 
 task copyDocument(type: Copy) {
 	dependsOn asciidoctor
