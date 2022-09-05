@@ -14,7 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.project.sidefit.api.dto.NotificationDto.*;
 
@@ -70,23 +69,28 @@ public class NotificationService {
         return notificationRepository.save(notification).getId();
     }
 
+    public void checkAll(List<Long> notificationIds) {
+        for (Long notificationId : notificationIds) {
+            Notification notification = findNotification(notificationId);
+            notification.check();
+        }
+    }
+
     @Transactional(readOnly = true)
     public NotificationResponseDto findNotificationDto(Long notificationId) {
         return new NotificationResponseDto(findNotification(notificationId));
     }
 
     @Transactional(readOnly = true)
-    public List<NotificationResponseDto> findNotificationDtoList() {
-        return notificationRepository.findAll().stream()
-                .map(NotificationResponseDto::new)
-                .collect(Collectors.toList());
-    }
+    public NotificationSimpleDto findCountAndImageUrlWithReceiverId(Long receiverId) {
+        User receiver = userRepository.getReferenceById(receiverId);
+        List<Notification> notifications = notificationRepository.findWithReceiverIdAndUnChecked(receiver.getId());
 
-    @Transactional(readOnly = true)
-    public List<NotificationResponseDto> findNotificationDtoListWithSenderAndReceiverId(Long senderId, Long receiverId) {
-        return notificationRepository.findWithSenderIdAndReceiverId(senderId, receiverId).stream()
-                .map(NotificationResponseDto::new)
-                .collect(Collectors.toList());
+        return NotificationSimpleDto.builder()
+                .receiverId(receiver.getId())
+                .imageUrl(receiver.getImage().getImageUrl())
+                .count(notifications.size())
+                .build();
     }
 
     @Transactional(readOnly = true)

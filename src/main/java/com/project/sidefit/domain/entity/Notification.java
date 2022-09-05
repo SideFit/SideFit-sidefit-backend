@@ -29,10 +29,16 @@ public class Notification extends BaseTime {
     @Enumerated(EnumType.STRING)
     private NotificationType type; // CHAT, PERSONAL
 
+    private boolean isChecked; // false: 확인 x, true: 확인 o
+
     public Notification(User sender, User receiver, String content, NotificationType type) {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
         this.type = type;
+    }
+
+    public void check() {
+        isChecked = true;
     }
 }
