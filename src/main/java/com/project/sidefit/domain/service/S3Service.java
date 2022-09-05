@@ -3,6 +3,8 @@ package com.project.sidefit.domain.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.project.sidefit.domain.entity.Image;
+import com.project.sidefit.domain.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,8 @@ public class S3Service {
 
     private final AmazonS3Client amazonS3Client;
 
+    private final ImageRepository imageRepository;
+
     @PostConstruct
     private void init() {
         if (environment.equals("local")) {
@@ -47,12 +51,17 @@ public class S3Service {
 
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new IllegalArgumentException("error: MultipartFile -> File convert fail"));
-        return upload(uploadFile, dirName);
+        return upload(uploadFile, multipartFile.getOriginalFilename(), dirName);
     }
 
-    public String upload(File uploadFile, String dirName) {
-        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름
+    public String upload(File uploadFile, String originalFilename, String dirName) {
+        String fileName = dirName + "/" + uploadFile.getName();   // S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
+
+
+        Image image = new Image(originalFilename, uploadImageUrl);
+        imageRepository.save(image);
+
         removeNewFile(uploadFile);
         return uploadImageUrl;
     }
@@ -86,8 +95,6 @@ public class S3Service {
         // S3에 저장될 파일이름
         String storeFileName = createStoreFileName(originalFilename);
 
-        log.info(System.getProperty("user.dir"));
-
         File convertFile = new File(fileDir + storeFileName);
         multipartFile.transferTo(convertFile);
 
@@ -104,4 +111,9 @@ public class S3Service {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
     }
+
+    /*private String extractFileName(String originalFilename) {
+        int pos = originalFilename.lastIndexOf(".");
+        return originalFilename.substring(0, pos);
+    }*/
 }

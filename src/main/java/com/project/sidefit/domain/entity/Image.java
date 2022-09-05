@@ -17,7 +17,6 @@ public class Image extends BaseTime {
 
     private String name;
 
-    @Column(length = 500)
     private String imageUrl;
 
     public Image(String name, String imageUrl) {
