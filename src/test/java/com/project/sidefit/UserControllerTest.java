@@ -6,6 +6,7 @@ import com.project.sidefit.api.dto.UserRequestDto;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.domain.entity.Mbti;
 import com.project.sidefit.domain.service.UserService;
+import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
@@ -29,6 +30,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.http.MediaType.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -63,16 +66,30 @@ public class UserControllerTest {
                 .tags(new ArrayList<String>()).build();
         response.add(user);
 
+        /*String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDI4Mzc0NCwiZXhwIjoxNjYwMjg3MzQ0fQ.oE64nKkVmFqRx0LgblAfMXvXDG9lU8sE57DG8heBeAU";
+        String refreshToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE2MjA2OTJ9.mG-udQ3mogvgP9ak3rnvU5sW8h3q4sntldz_FUhAIU4";
+
+        TokenDto token = TokenDto.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .accessTokenExpireDate(60 * 60 * 1000L)
+                .build();*/
+
         given(userService.findAll()).willReturn(response);
 
         //when
         ResultActions result = this.mockMvc.perform(get("/api/users")
+//                .header("X-AUTH-TOKEN", accessToken)
                 .accept(APPLICATION_JSON)
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("get_users",
+//                        requestHeaders(
+//                                headerWithName("X-AUTH-TOKEN").description("JWT access token")
+//                        ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
                                 fieldWithPath("code").type(NUMBER).description("상태 코드"),

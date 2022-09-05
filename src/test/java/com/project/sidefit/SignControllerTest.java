@@ -54,7 +54,7 @@ public class SignControllerTest {
 
 
     @Test
-    @DisplayName("이메일 중복 체크 : Get /api/auth/email/check")
+    @DisplayName("이메일 중복 체크 : Post /api/auth/email/check")
     public void checkEmailDuplicate() throws Exception {
         //given
         given(signService.validateDuplicatedEmail(any(String.class))).willReturn(false);
@@ -62,7 +62,7 @@ public class SignControllerTest {
 
         //when
         EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
-        ResultActions result = this.mockMvc.perform(get("/api/auth/email/check")
+        ResultActions result = this.mockMvc.perform(post("/api/auth/email/check")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(APPLICATION_JSON)
@@ -170,14 +170,14 @@ public class SignControllerTest {
     }
 
     @Test
-    @DisplayName("이메일 인증 체크 : Get /api/auth/email/auth/check")
+    @DisplayName("이메일 인증 체크 : Post /api/auth/email/auth/check")
     public void emailCheck() throws Exception {
         //given
         EmailRequestDto request = EmailRequestDto.builder().email("test@gmail.com").build();
         given(signService.checkEmailAuth(any(String.class))).willReturn(true);
 
         //when
-        ResultActions result = this.mockMvc.perform(get("/api/auth/email/auth/check")
+        ResultActions result = this.mockMvc.perform(post("/api/auth/email/auth/check")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(APPLICATION_JSON)
@@ -226,14 +226,14 @@ public class SignControllerTest {
     }
 
     @Test
-    @DisplayName("닉네임 중복 체크 : Get /api/auth/nickname/check")
+    @DisplayName("닉네임 중복 체크 : Post /api/auth/nickname/check")
     public void checkNicknameDuplicate() throws Exception {
         //given
         given(signService.validateDuplicatedNickname(anyString())).willReturn(false);
 
         //when
         NicknameRequestDto request = NicknameRequestDto.builder().nickname("testUser").build();
-        ResultActions result = this.mockMvc.perform(get("/api/auth/nickname/check")
+        ResultActions result = this.mockMvc.perform(post("/api/auth/nickname/check")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .accept(APPLICATION_JSON)
