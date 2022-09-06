@@ -6,6 +6,7 @@ import com.project.sidefit.domain.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -17,7 +18,7 @@ public class ImageApiController {
 
     private final S3Service s3Service;
 
-    @GetMapping("/image")
+    /*@GetMapping("/image")
     public String uploadImage(@ModelAttribute FileDto fileDto) {
         return "image-upload";
     }
@@ -31,10 +32,10 @@ public class ImageApiController {
         } catch (IOException e) {
             return Response.failure(-1000, "이미지 업로드 실패");
         }
-    }
+    }*/
 
-    /*@PostMapping("/image")
-    public Response updateUserImage(MultipartFile multipartFile) {
+    @PostMapping("/image")
+    public Response uploadImage(MultipartFile multipartFile) {
         if (multipartFile.isEmpty()) {
             return Response.failure(-1000, "이미지 파일 필요");
         }
@@ -44,6 +45,18 @@ public class ImageApiController {
         } catch (IOException e) {
             return Response.failure(-1000, "이미지 업로드 실패");
         }
+
+        return Response.success();
+    }
+
+    @DeleteMapping("/image")
+    public Response deleteImage(String imageUrl) {
+        s3Service.deleteFile(imageUrl, "image");
+        return Response.success();
+    }
+
+    /*@PostMapping("/image/download")
+    public Response download() {
 
         return Response.success();
     }*/

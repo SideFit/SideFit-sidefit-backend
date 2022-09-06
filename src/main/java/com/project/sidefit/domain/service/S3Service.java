@@ -2,6 +2,7 @@ package com.project.sidefit.domain.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.project.sidefit.domain.entity.Image;
 import com.project.sidefit.domain.repository.ImageRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class S3Service {
 
@@ -47,6 +50,22 @@ public class S3Service {
         }
     }
 
+    public void deleteFile(String imageUrl, String dirName) {
+        imageRepository.deleteByImageUrl(imageUrl);
+//        DeleteObjectRequest request = new DeleteObjectRequest(bucket, imageUrl);
+//        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageUrl));
+        int pos = imageUrl.lastIndexOf("/");
+
+        String key = dirName + imageUrl.substring(pos);
+
+        log.info(key);
+
+        DeleteObjectRequest request = new DeleteObjectRequest(bucket, key);
+        amazonS3Client.deleteObject(request);
+
+//        amazonS3Client.deleteObject(bucket, key);
+    }
+
     public String uploadFiles(MultipartFile multipartFile, String dirName) throws IOException {
 
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
@@ -68,8 +87,8 @@ public class S3Service {
 
     // S3로 업로드
     private String putS3(File uploadFile, String fileName) {
-        amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile));
+//                .withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
