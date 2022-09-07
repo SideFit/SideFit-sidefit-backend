@@ -419,22 +419,19 @@ public class ProjectTest {
     @WithMockUser
     @DisplayName("GET /api/project/search")
     void search_project_test() throws Exception {
-        //given
-        SearchRequestDto searchRequestDto = new SearchRequestDto("test", SearchCondition.LATEST_ORDER);
-
         //when
         ResultActions result = mockMvc.perform(get("/api/project/search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(searchRequestDto))
-                .accept(MediaType.APPLICATION_JSON)
+                .param("keyword", "test")
+                .param("condition", "")
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("get_project_search",
-                        requestFields(
-                                fieldWithPath("keyword").type(STRING).description("검색 키워드"),
-                                fieldWithPath("condition").type(STRING).description("검색 조건")
+                        requestParameters(
+                                parameterWithName("keyword").description("검색 키워드"),
+                                parameterWithName("condition").description("검색 조건")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
