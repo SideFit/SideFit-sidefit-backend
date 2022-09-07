@@ -68,18 +68,6 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SearchRequestDto {
-
-        @NotBlank(message = "검색하려는 키워드를 입력해주세요.")
-        private String keyword;
-
-        @NotNull(message = "검색 조건을 설정해주세요.")
-        private SearchCondition condition; // 최신 순, 정확도 순
-    }
-
-    @Getter
-    @NoArgsConstructor
     public static class ProjectQueryDto {
 
         // project
