@@ -1,14 +1,15 @@
 package com.project.sidefit.api.controller;
 
-import com.project.sidefit.api.dto.FileDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.domain.service.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 //@Controller
 @RestController
@@ -55,9 +56,8 @@ public class ImageApiController {
         return Response.success();
     }
 
-    /*@PostMapping("/image/download")
-    public Response download() {
-
-        return Response.success();
-    }*/
+    @GetMapping("/image/download")
+    public ResponseEntity<byte[]> download(String imageUrl) throws IOException {
+        return s3Service.downloadFile(imageUrl, "image");
+    }
 }

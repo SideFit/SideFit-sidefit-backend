@@ -1,22 +1,33 @@
 package com.project.sidefit.domain.service;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
+import com.amazonaws.util.IOUtils;
 import com.project.sidefit.domain.entity.Image;
 import com.project.sidefit.domain.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,20 +61,85 @@ public class S3Service {
         }
     }
 
-    public void deleteFile(String imageUrl, String dirName) {
-        imageRepository.deleteByImageUrl(imageUrl);
-//        DeleteObjectRequest request = new DeleteObjectRequest(bucket, imageUrl);
-//        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, imageUrl));
+    public ResponseEntity<byte[]> downloadFile(String imageUrl, String dirName) throws IOException {
+        Image image = imageRepository.findByImageUrl(imageUrl).orElseThrow(IllegalStateException::new);
+        String originalFilename = image.getName();
         int pos = imageUrl.lastIndexOf("/");
 
+        String key = dirName + imageUrl.substring(pos);
+
+        S3Object object = amazonS3Client.getObject(bucket, key);
+        S3ObjectInputStream s3is = object.getObjectContent();
+        ObjectMetadata metadata = object.getObjectMetadata();
+        byte[] bytes = IOUtils.toByteArray(s3is);
+
+        String encodedOriginalFilename = UriUtils.encode(originalFilename, StandardCharsets.UTF_8);
+
+        log.info("content type",MediaType.parseMediaType(metadata.getContentType()));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.parseMediaType(metadata.getContentType()));
+        httpHeaders.setContentLength(bytes.length);
+        httpHeaders.setContentDispositionFormData("attachment", encodedOriginalFilename);
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .body(bytes);
+
+        /*try {
+
+            // 로컬 디렉토리에 파일 다운로드
+            String key = dirName + imageUrl.substring(pos);
+
+            S3Object o = amazonS3Client.getObject(bucket, key);
+            S3ObjectInputStream s3is = o.getObjectContent();
+            FileOutputStream fos = new FileOutputStream(file);
+
+
+            ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(bucket, key);
+
+
+
+            byte[] read_buf = new byte[1024];
+            int read_len = 0;
+            while ((read_len = s3is.read(read_buf)) > 0) {
+                fos.write(read_buf, 0, read_len);
+            }
+
+            s3is.close();
+            fos.close();
+        } catch (AmazonServiceException e) {
+            log.error("error : {}", e);
+        } catch (FileNotFoundException e) {
+            log.error("error : {}", e);
+        } catch (IOException e) {
+            log.error("error : {}", e);
+        } finally {
+            // 로컬 파일 삭제
+            removeNewFile(file);
+        }
+
+        UrlResource resource = new UrlResource("file:" + path);
+        log.info("file:{}", file.getPath());
+
+        String encodedOriginalFilename = UriUtils.encode(originalFilename, StandardCharsets.UTF_8);
+        String contentDisposition = "attachment; filename=\"" + encodedOriginalFilename + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(resource);*/
+    }
+
+    public void deleteFile(String imageUrl, String dirName) {
+        imageRepository.deleteByImageUrl(imageUrl);
+
+        int pos = imageUrl.lastIndexOf("/");
         String key = dirName + imageUrl.substring(pos);
 
         log.info(key);
 
         DeleteObjectRequest request = new DeleteObjectRequest(bucket, key);
         amazonS3Client.deleteObject(request);
-
-//        amazonS3Client.deleteObject(bucket, key);
     }
 
     public String uploadFiles(MultipartFile multipartFile, String dirName) throws IOException {
