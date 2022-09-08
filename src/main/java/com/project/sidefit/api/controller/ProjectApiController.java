@@ -2,10 +2,12 @@ package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -88,14 +90,14 @@ public class ProjectApiController {
     }
 
     @GetMapping("/project/search")
-    public Response searchProject(@Valid @RequestBody SearchRequestDto searchRequestDto) {
-        if (searchRequestDto.getCondition().equals(LATEST_ORDER)) {
-            return Response.success(projectRepository.searchProjectByLatestOrder(searchRequestDto.getKeyword()));
+    public Response searchProject(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = "LATEST_ORDER") SearchCondition condition) {
+        if (!StringUtils.hasText(keyword)) {
+            return Response.failure(-1000, "키워드를 입력해주세요.");
         }
-        if (searchRequestDto.getCondition().equals(ACCURACY_ORDER)) {
-            return Response.success(projectRepository.searchProjectByAccuracyOrder(searchRequestDto.getKeyword()));
+        if (condition == ACCURACY_ORDER) {
+            return Response.success(projectRepository.searchProjectByAccuracyOrder(keyword));
         }
-        return Response.failure(-1000, "검색 조건이 충분하지 않습니다.");
+        return Response.success(projectRepository.searchProjectByLatestOrder(keyword));
     }
 
     @GetMapping("/project/search/recommend/list")
