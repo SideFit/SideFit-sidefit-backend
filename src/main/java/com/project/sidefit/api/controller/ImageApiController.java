@@ -3,6 +3,7 @@ package com.project.sidefit.api.controller;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.domain.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 //@Controller
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class ImageApiController {
         try {
             s3Service.uploadFiles(multipartFile, "image");
         } catch (IOException e) {
+            log.error("error",e);
             return Response.failure(-1000, "이미지 업로드 실패");
         }
 

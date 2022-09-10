@@ -9,9 +9,12 @@ import com.project.sidefit.domain.service.UserService;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -44,30 +47,17 @@ public class UserController {
 
     /**
      * 프로필 수정
+     * 
+     * null 값 들어오는것에 대한 고민,,, MultipartFile 등
      */
-    @PatchMapping("/user/{id}")
-    public Response updateUser(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto) {
+    @PatchMapping(value = "/user/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Response updateUser(@PathVariable Long id, @RequestPart("image") MultipartFile image,
+                               @RequestPart("userRequestDto") UserRequestDto userRequestDto) throws IOException {
 
-        userService.updateUser(id, userRequestDto.toUserDto());
+        userService.updateUser(id, image, userRequestDto.toUserDto());
 
         return Response.success();
     }
-
-    /**
-     * 테스트용
-     */
-    @PostMapping("/test-save")
-    public Response save(@AuthenticationPrincipal User user) {
-
-        return Response.success(userService.save(user));
-    }
-
-
-
-
-
-
-
 
 
 
