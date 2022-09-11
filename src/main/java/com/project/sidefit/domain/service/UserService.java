@@ -41,10 +41,16 @@ public class UserService {
         return users.stream().map(u -> new UserListDto(u)).collect(Collectors.toList());
     }
 
+    // TODO user, image fetch join?
     public UserDetailDto findDetail(Long id) {
 
         User user = userJpaRepo.findById(id).orElseThrow(CUserNotFoundException::new);
-        return new UserDetailDto(user);
+        Image image = user.getImage();
+        String imageUrl = null;
+        if (image != null) {
+            imageUrl = image.getImageUrl();
+        }
+        return new UserDetailDto(user, imageUrl);
     }
 
 
