@@ -83,10 +83,12 @@ public class UserService {
         List<Favorite> favorites = userDto.getFavorites().stream().map(favorite -> new Favorite(favorite)).collect(Collectors.toList());
         List<CurrentStatus> currentStatuses = userDto.getCurrentStatuses().stream().map(status -> new CurrentStatus(status)).collect(Collectors.toList());
         List<Tech> teches = userDto.getTeches().stream().map(tech -> new Tech(tech)).collect(Collectors.toList());
+        List<Portfolio> portfolios = userDto.getPortfolios().stream().map(p -> new Portfolio(p.getTitle(), p.getUrl())).collect(Collectors.toList());
 
         String imageUrl = s3Service.uploadFiles(image, user.getEmail());
         Image findImage = imageRepository.findByImageUrl(imageUrl).orElseThrow(IllegalStateException::new);
 
-        user.updateUser(userDto.getJob(), userDto.getIntroduction(), tags, favorites, currentStatuses, teches, userDto.getMbti(), findImage);
+        user.updateUser(userDto.getJob(), userDto.getIntroduction(), tags, favorites, currentStatuses,
+                teches, portfolios, userDto.getMbti(), findImage);
     }
 }

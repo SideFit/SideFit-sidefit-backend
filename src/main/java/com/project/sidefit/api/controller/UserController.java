@@ -26,6 +26,8 @@ public class UserController {
 
     /**
      * 전체 회원 목록 조회
+     * tag 까지 fetch join?
+     * slice 형태
      */
     @GetMapping("/users")
     public Response findAll() {
@@ -37,6 +39,7 @@ public class UserController {
 
     /**
      * 회원 상세 조회
+     * 필요한 정보들 fetch join?
       */
     @GetMapping("/user/{id}")
     public Response findDetail(@PathVariable Long id) {

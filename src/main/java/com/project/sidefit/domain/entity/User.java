@@ -72,7 +72,9 @@ public class User extends BaseTime implements UserDetails {
     private List<Tech> teches = new ArrayList<>();
 
     // Portfolio
-
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Portfolio> portfolios = new ArrayList<>();
 
 
     // mbti
@@ -107,7 +109,7 @@ public class User extends BaseTime implements UserDetails {
     }
 
     public void updateUser(String job, String introduction, List<Tag> tags, List<Favorite> favorites,
-                           List<CurrentStatus> currentStatuses, List<Tech> teches, Mbti mbti, Image image) {
+                           List<CurrentStatus> currentStatuses, List<Tech> teches, List<Portfolio> portfolios, Mbti mbti, Image image) {
 
         this.job = job;
         this.introduction = introduction;
@@ -123,6 +125,9 @@ public class User extends BaseTime implements UserDetails {
 
         this.teches.clear();
         this.teches.addAll(teches);
+
+        this.portfolios.clear();
+        this.portfolios.addAll(portfolios);
 
         this.mbti = mbti;
         this.image = image;
