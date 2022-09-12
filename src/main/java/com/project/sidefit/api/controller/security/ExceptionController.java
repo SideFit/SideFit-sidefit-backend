@@ -21,4 +21,5 @@ public class ExceptionController {
     public void accessDeniedException() {
         throw new CAccessDeniedException();
     }
+
 }
