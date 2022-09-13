@@ -1,7 +1,10 @@
 package com.project.sidefit.domain.repository.project;
 
 import com.project.sidefit.api.dto.QProjectDto_ProjectQueryDto;
+import com.project.sidefit.domain.enums.SearchCondition;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,12 +24,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ProjectQueryDto> searchProjectByLatestOrder(String keyword) {
+    public List<ProjectQueryDto> searchProject(String keyword) {
         List<ProjectQueryDto> projects = queryFactory
                 .select(new QProjectDto_ProjectQueryDto(
                         project.id,
                         project.title,
                         project.type,
+                        project.field,
                         project.hashtag,
                         project.status,
                         project.createdDate,
@@ -68,12 +72,13 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     }
 
     @Override
-    public List<ProjectQueryDto> searchProjectByAccuracyOrder(String keyword) {
+    public List<ProjectQueryDto> searchProjectByKeywords(List<String> jobGroups, List<String> fields, List<String> periods, List<Integer> types, SearchCondition condition) {
         List<ProjectQueryDto> projects = queryFactory
                 .select(new QProjectDto_ProjectQueryDto(
                         project.id,
                         project.title,
                         project.type,
+                        project.field,
                         project.hashtag,
                         project.status,
                         project.createdDate,
@@ -83,9 +88,10 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 ))
                 .from(project)
                 .join(project.image, image)
-                .where(project.title.contains(keyword)
-                        .or(project.introduction.contains(keyword))
-                        .or(project.hashtag.contains(keyword)))
+                .where(inFields(fields))
+                .where(inPeriods(periods))
+                .where(inTypes(types))
+                .orderBy(byCondition(condition))
                 .fetch();
 
         List<Long> projectIds = projects.stream()
@@ -104,38 +110,39 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .from(recruit)
                 .join(recruit.project, project)
                 .where(project.id.in(projectIds))
+                .where(inJobGroups(jobGroups))
                 .fetch();
 
         Map<Long, List<RecruitResponseDto>> recruitMap = recruits.stream()
                 .collect(Collectors.groupingBy(RecruitResponseDto::getProjectId));
         projects.forEach(projectQueryDto -> projectQueryDto.setRecruits(recruitMap.get(projectQueryDto.getId())));
 
-        Map<ProjectQueryDto, Integer> countMap = new HashMap<>();
-        for (ProjectQueryDto project : projects) {
-            int count1 = countKeyword(project.getTitle(), keyword);
-            int count2 = countKeyword(findIntroductionByProjectId(project.getId()), keyword);
-            int count3 = countKeyword(project.getHashtag(), keyword);
-            countMap.put(project, count1 + count2 + count3);
-        }
-        List<Map.Entry<ProjectQueryDto, Integer>> entries = new ArrayList<>(countMap.entrySet());
-        entries.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-
-        List<ProjectQueryDto> sortedProjects = new ArrayList<>();
-        for (Map.Entry<ProjectQueryDto, Integer> entry : entries) {
-            sortedProjects.add(entry.getKey());
-        }
-        return sortedProjects;
+        return projects;
     }
 
-    private String findIntroductionByProjectId(Long projectId) {
-        return queryFactory
-                .select(project.introduction)
-                .from(project)
-                .where(project.id.eq(projectId))
-                .fetchOne();
+    private BooleanExpression inFields(List<String> fields) {
+        return !fields.isEmpty() ? project.field.in(fields) : null;
     }
 
-    private int countKeyword(String str, String keyword) {
-        return str.length() - str.replace(keyword, "").length();
+    private BooleanExpression inPeriods(List<String> periods) {
+        return !periods.isEmpty() ? project.period.in(periods) : null;
+    }
+
+    private BooleanExpression inTypes(List<Integer> types) {
+        return !types.isEmpty() ? project.type.in(types) : null;
+    }
+
+    private BooleanExpression inJobGroups(List<String> jobGroups) {
+        return !jobGroups.isEmpty() ? recruit.jobGroup.in(jobGroups) : null;
+    }
+
+    private OrderSpecifier<?> byCondition(SearchCondition condition) {
+        if (condition == SearchCondition.LATEST) {
+            return project.createdDate.desc();
+        }
+        if (condition == SearchCondition.POPULARITY) {
+            return project.id.asc(); // TODO : 인기순 정렬
+        }
+        return null;
     }
 }

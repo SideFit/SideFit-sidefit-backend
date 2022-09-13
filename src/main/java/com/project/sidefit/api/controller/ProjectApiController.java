@@ -14,7 +14,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static com.project.sidefit.api.dto.ProjectDto.*;
-import static com.project.sidefit.domain.enums.SearchCondition.*;
 
 @RestController
 @RequestMapping("/api")
@@ -90,14 +89,19 @@ public class ProjectApiController {
     }
 
     @GetMapping("/project/search")
-    public Response searchProject(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = "LATEST_ORDER") SearchCondition condition) {
+    public Response searchProject(@RequestParam(required = false) String keyword) {
         if (!StringUtils.hasText(keyword)) {
             return Response.failure(-1000, "키워드를 입력해주세요.");
         }
-        if (condition == ACCURACY_ORDER) {
-            return Response.success(projectRepository.searchProjectByAccuracyOrder(keyword));
-        }
-        return Response.success(projectRepository.searchProjectByLatestOrder(keyword));
+        return Response.success(projectRepository.searchProject(keyword));
+    }
+
+    // TODO : condition 추가 예정
+    @GetMapping("/project/keyword-search")
+    public Response keywordSearchProject(@RequestParam(defaultValue = "") List<String> jobGroups, @RequestParam(defaultValue = "") List<String> fields,
+                                         @RequestParam(defaultValue = "") List<String> periods, @RequestParam(defaultValue = "") List<Integer> types,
+                                         @RequestParam(defaultValue = "LATEST") SearchCondition condition) {
+        return Response.success(projectRepository.searchProjectByKeywords(jobGroups, fields, periods, types, condition));
     }
 
     @GetMapping("/project/search/recommend/list")
@@ -108,6 +112,6 @@ public class ProjectApiController {
     @GetMapping("/project/search/recommend/{keywordId}")
     public Response selectRecommendKeyword(@PathVariable String keywordId) {
         KeywordResponseDto keyword = projectService.findKeywordDto(Long.valueOf(keywordId));
-        return Response.success(projectRepository.searchProjectByLatestOrder(keyword.getWord()));
+        return Response.success(projectRepository.searchProject(keyword.getWord()));
     }
 }

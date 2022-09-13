@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SearchCondition {
 
-    LATEST_ORDER("LATEST", "최신 순"),
-    ACCURACY_ORDER("ACCURACY", "정확도 순");
+    LATEST("LATEST_ORDER", "최신 순"),
+    POPULARITY("POPULARITY_ORDER", "인기 순");
 
     private final String key;
     private final String val;
