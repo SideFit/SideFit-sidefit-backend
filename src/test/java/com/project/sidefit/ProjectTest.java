@@ -2,7 +2,6 @@ package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.domain.entity.*;
-import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.ImageRepository;
 import com.project.sidefit.domain.repository.UserJpaRepo;
 import com.project.sidefit.domain.repository.project.KeywordRepository;
@@ -93,8 +92,8 @@ public class ProjectTest {
         RecruitRequestDto recruitDto3 = new RecruitRequestDto("백엔드", 1);
         RecruitRequestDto recruitDto4 = new RecruitRequestDto("프론트엔드", 2);
 
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 1, "#스포츠", "This is test project", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), List.of(recruitDto1, recruitDto2));
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 2, "#웰빙", "This is test project", "2 month", "#JavaScript#NodeJs", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), List.of(recruitDto3, recruitDto4));
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 1, "스포츠", "This is test project", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), List.of(recruitDto1, recruitDto2));
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 2, "웰빙", "This is test project", "2 month", "#JavaScript#NodeJs", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), List.of(recruitDto3, recruitDto4));
         projectService.makeProject(leader.getId(), image.getId(), projectRequestDto1);
         projectService.makeProject(leader.getId(), image.getId(), projectRequestDto2);
     }
@@ -423,15 +422,13 @@ public class ProjectTest {
         ResultActions result = mockMvc.perform(get("/api/project/search")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("keyword", "test")
-                .param("condition", "")
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("get_project_search",
                         requestParameters(
-                                parameterWithName("keyword").description("검색 키워드"),
-                                parameterWithName("condition").description("검색 조건")
+                                parameterWithName("keyword").description("검색 키워드")
                         ),
                         responseFields(
                                 fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
@@ -439,6 +436,53 @@ public class ProjectTest {
                                 fieldWithPath("result.data[].id").type(NUMBER).description("프로젝트 id"),
                                 fieldWithPath("result.data[].title").type(STRING).description("프로젝트 제목"),
                                 fieldWithPath("result.data[].type").type(NUMBER).description("프로젝트 유형"),
+                                fieldWithPath("result.data[].field").type(STRING).description("프로젝트 분야"),
+                                fieldWithPath("result.data[].hashtag").type(STRING).description("프로젝트 해시태그"),
+                                fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
+                                fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
+                                fieldWithPath("result.data[].lastModifiedDate").type(STRING).description("수정 일자"),
+                                fieldWithPath("result.data[].imageId").type(NUMBER).description("이미지 id"),
+                                fieldWithPath("result.data[].imageUrl").type(STRING).description("이미지 url"),
+                                fieldWithPath("result.data[].recruits[].id").type(NUMBER).description("모집 id"),
+                                fieldWithPath("result.data[].recruits[].projectId").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].recruits[].jobGroup").type(STRING).description("모집 직군"),
+                                fieldWithPath("result.data[].recruits[].currentNumber").type(NUMBER).description("현재 인원"),
+                                fieldWithPath("result.data[].recruits[].recruitNumber").type(NUMBER).description("모집 인원")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("GET /api/project/keyword-search")
+    void keyword_search_project_test() throws Exception {
+        //when
+        ResultActions result = mockMvc.perform(get("/api/project/keyword-search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("jobGroups", "백엔드", "프론트엔드")
+                .param("fields", "스포츠", "웰빙")
+                .param("periods", "1 month", "2 month")
+                .param("types", "1", "2")
+                .param("condition", "")
+        );
+
+        //then
+        result.andExpect(status().isOk())
+                .andDo(document("get_keyword_project_search",
+                        requestParameters(
+                                parameterWithName("jobGroups").description("직군 키워드"),
+                                parameterWithName("fields").description("분야 키워드"),
+                                parameterWithName("periods").description("프로젝트 기간 키워드"),
+                                parameterWithName("types").description("프로젝트 유형 키워드"),
+                                parameterWithName("condition").description("정렬 기준")
+                        ),
+                        responseFields(
+                                fieldWithPath("success").type(BOOLEAN).description("성공 여부"),
+                                fieldWithPath("code").type(NUMBER).description("상태 코드"),
+                                fieldWithPath("result.data[].id").type(NUMBER).description("프로젝트 id"),
+                                fieldWithPath("result.data[].title").type(STRING).description("프로젝트 제목"),
+                                fieldWithPath("result.data[].type").type(NUMBER).description("프로젝트 유형"),
+                                fieldWithPath("result.data[].field").type(STRING).description("프로젝트 분야"),
                                 fieldWithPath("result.data[].hashtag").type(STRING).description("프로젝트 해시태그"),
                                 fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
                                 fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
