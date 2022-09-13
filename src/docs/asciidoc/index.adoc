@@ -249,6 +249,8 @@ include::{snippets}/get_project_search/http-response.adoc[]
 include::{snippets}/get_project_search/curl-request.adoc[]
 
 === 프로젝트 키워드 검색
+RequestBody
+include::{snippets}/get_keyword_project_search/request-fields.adoc[]
 RequestParameters
 include::{snippets}/get_keyword_project_search/request-parameters.adoc[]
 ResponseBody

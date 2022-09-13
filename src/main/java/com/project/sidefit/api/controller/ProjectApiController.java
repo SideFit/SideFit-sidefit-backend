@@ -97,11 +97,17 @@ public class ProjectApiController {
     }
 
     // TODO : condition 추가 예정
-    @GetMapping("/project/keyword-search")
-    public Response keywordSearchProject(@RequestParam(defaultValue = "") List<String> jobGroups, @RequestParam(defaultValue = "") List<String> fields,
-                                         @RequestParam(defaultValue = "") List<String> periods, @RequestParam(defaultValue = "") List<Integer> types,
-                                         @RequestParam(defaultValue = "LATEST") SearchCondition condition) {
-        return Response.success(projectRepository.searchProjectByKeywords(jobGroups, fields, periods, types, condition));
+    @PostMapping("/project/keyword-search")
+    public Response keywordSearchProject(@RequestBody KeywordSearchRequestDto keywordSearchRequestDto, @RequestParam(defaultValue = "LATEST") SearchCondition condition) {
+        return Response.success(
+                projectRepository.searchProjectByKeywords(
+                        keywordSearchRequestDto.getJobGroups(),
+                        keywordSearchRequestDto.getFields(),
+                        keywordSearchRequestDto.getPeriods(),
+                        keywordSearchRequestDto.getTypes(),
+                        condition
+                )
+        );
     }
 
     @GetMapping("/project/search/recommend/list")

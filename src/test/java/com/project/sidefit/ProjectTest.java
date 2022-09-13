@@ -92,8 +92,8 @@ public class ProjectTest {
         RecruitRequestDto recruitDto3 = new RecruitRequestDto("백엔드", 1);
         RecruitRequestDto recruitDto4 = new RecruitRequestDto("프론트엔드", 2);
 
-        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 1, "스포츠", "This is test project", "1 month", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), List.of(recruitDto1, recruitDto2));
-        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 2, "웰빙", "This is test project", "2 month", "#JavaScript#NodeJs", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), List.of(recruitDto3, recruitDto4));
+        ProjectRequestDto projectRequestDto1 = new ProjectRequestDto("test1", 1, "스포츠", "This is test project", "1달", "#Java#Spring", "plan1", "#hashtag1", image.getName(), image.getImageUrl(), List.of(recruitDto1, recruitDto2));
+        ProjectRequestDto projectRequestDto2 = new ProjectRequestDto("test2", 2, "웰빙", "This is test project", "2달", "#JavaScript#NodeJs", "plan2", "#hashtag2", image.getName(), image.getImageUrl(), List.of(recruitDto3, recruitDto4));
         projectService.makeProject(leader.getId(), image.getId(), projectRequestDto1);
         projectService.makeProject(leader.getId(), image.getId(), projectRequestDto2);
     }
@@ -456,24 +456,26 @@ public class ProjectTest {
     @WithMockUser
     @DisplayName("GET /api/project/keyword-search")
     void keyword_search_project_test() throws Exception {
+        // given
+        KeywordSearchRequestDto keywordSearchRequestDto = new KeywordSearchRequestDto(List.of("백엔드", "프론트엔드"), List.of("웰빙", "스포츠"), List.of("1달", "2달"), List.of(1, 2));
+
         //when
-        ResultActions result = mockMvc.perform(get("/api/project/keyword-search")
+        ResultActions result = mockMvc.perform(post("/api/project/keyword-search")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("jobGroups", "백엔드", "프론트엔드")
-                .param("fields", "스포츠", "웰빙")
-                .param("periods", "1 month", "2 month")
-                .param("types", "1", "2")
+                .content(objectMapper.writeValueAsString(keywordSearchRequestDto))
                 .param("condition", "")
         );
 
         //then
         result.andExpect(status().isOk())
                 .andDo(document("get_keyword_project_search",
+                        requestFields(
+                                fieldWithPath("jobGroups").type(ARRAY).description("직군 키워드"),
+                                fieldWithPath("fields").type(ARRAY).description("분야 키워드"),
+                                fieldWithPath("periods").type(ARRAY).description("프로젝트 기간 키워드"),
+                                fieldWithPath("types").type(ARRAY).description("프로젝트 유형 키워드")
+                        ),
                         requestParameters(
-                                parameterWithName("jobGroups").description("직군 키워드"),
-                                parameterWithName("fields").description("분야 키워드"),
-                                parameterWithName("periods").description("프로젝트 기간 키워드"),
-                                parameterWithName("types").description("프로젝트 유형 키워드"),
                                 parameterWithName("condition").description("정렬 기준")
                         ),
                         responseFields(

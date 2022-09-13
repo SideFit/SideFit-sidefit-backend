@@ -67,6 +67,17 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KeywordSearchRequestDto {
+
+        private List<String> jobGroups;
+        private List<String> fields;
+        private List<String> periods;
+        private List<Integer> types;
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class ProjectQueryDto {
 
         // project
