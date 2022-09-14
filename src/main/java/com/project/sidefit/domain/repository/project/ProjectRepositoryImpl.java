@@ -116,6 +116,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
         Map<Long, List<RecruitResponseDto>> recruitMap = recruits.stream()
                 .collect(Collectors.groupingBy(RecruitResponseDto::getProjectId));
         projects.forEach(projectQueryDto -> projectQueryDto.setRecruits(recruitMap.get(projectQueryDto.getId())));
+        projects.removeIf(projectQueryDto -> projectQueryDto.getRecruits() == null);
 
         return projects;
     }
