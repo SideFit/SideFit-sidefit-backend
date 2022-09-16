@@ -4,7 +4,6 @@ import com.project.sidefit.domain.entity.Keyword;
 import com.project.sidefit.domain.entity.Project;
 import com.project.sidefit.domain.entity.ProjectUser;
 import com.project.sidefit.domain.entity.Recruit;
-import com.project.sidefit.domain.enums.SearchCondition;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -68,12 +67,24 @@ public class ProjectDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KeywordSearchRequestDto {
+
+        private List<String> jobGroups;
+        private List<String> fields;
+        private List<String> periods;
+        private List<Integer> types;
+    }
+
+    @Getter
+    @NoArgsConstructor
     public static class ProjectQueryDto {
 
         // project
         private Long id;
         private String title;
         private Integer type; // 0: 출시 목적, 1: 포트폴리오, 2: 토이 프로젝트
+        private String field;
         private String hashtag;
         private Boolean status;
         private LocalDateTime createdDate;
@@ -91,10 +102,11 @@ public class ProjectDto {
         }
 
         @QueryProjection
-        public ProjectQueryDto(Long id, String title, Integer type, String hashtag, Boolean status, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String imageUrl) {
+        public ProjectQueryDto(Long id, String title, Integer type, String field, String hashtag, Boolean status, LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long imageId, String imageUrl) {
             this.id = id;
             this.title = title;
             this.type = type;
+            this.field = field;
             this.hashtag = hashtag;
             this.status = status;
             this.createdDate = createdDate;
