@@ -1,8 +1,8 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.User;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
 import com.project.sidefit.domain.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class NotificationApiController {
 
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
-    private final UserJpaRepo userRepository;
+    private final UserRepository userRepository;
 
     @GetMapping(value = "/sse/connect", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)

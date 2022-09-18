@@ -1,23 +1,18 @@
-package com.project.sidefit.domain.entity;
+package com.project.sidefit.domain.entity.user;
 
+import com.project.sidefit.domain.entity.*;
+import com.project.sidefit.domain.entity.time.BaseTime;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
-//@Builder
 @Getter
 @Table(name = "users")
-//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTime implements UserDetails {
+public class User extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +23,7 @@ public class User extends BaseTime implements UserDetails {
     private Image image;
 
     // unique, not null
+    @Column(nullable = false, unique = true)
     private String email;
 
     // not null
@@ -35,13 +31,25 @@ public class User extends BaseTime implements UserDetails {
 
     // not null
     // TODO Role enum 단일값? or RoleType 엔티티 List?
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "roles",
-            joinColumns = @JoinColumn(name = "user_id"))
-    private List<String> roles = new ArrayList<>();
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @CollectionTable(
+//            name = "roles",
+//            joinColumns = @JoinColumn(name = "user_id"))
+//    private List<String> roles = new ArrayList<>();
+
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    private String providerId;
+
+
 
     // unique, not null
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     // 직무
@@ -83,9 +91,22 @@ public class User extends BaseTime implements UserDetails {
         user.nickname = nickname;
         user.job = job;
 
-        user.roles.add("ROLE_USER");
+        user.role = Role.ROLE_USER;
 
         return user;
+    }
+
+    @Builder
+    public User(String email, String nickname, Provider provider, String providerId, Role role) {
+        this.email = email;
+        this.nickname = nickname;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.role = role;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public void updateMbti(Mbti mbti) {
@@ -119,43 +140,5 @@ public class User extends BaseTime implements UserDetails {
         this.teches.addAll(teches);
 
         this.mbti = mbti;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles
-                .stream().map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    // pk 반환
-    @Override
-    public String getUsername() {
-        return String.valueOf(id);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

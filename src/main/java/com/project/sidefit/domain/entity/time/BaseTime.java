@@ -1,4 +1,4 @@
-package com.project.sidefit.domain.entity;
+package com.project.sidefit.domain.entity.time;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

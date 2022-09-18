@@ -3,7 +3,7 @@ package com.project.sidefit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
-import com.project.sidefit.domain.service.security.SignService;
+import com.project.sidefit.domain.service.auth.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class SignControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private SignService signService;
+    private AuthService signService;
 
     /*@MockBean
     private JwtProvider jwtProvider;

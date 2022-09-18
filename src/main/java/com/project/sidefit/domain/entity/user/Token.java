@@ -1,6 +1,8 @@
-package com.project.sidefit.domain.entity;
+package com.project.sidefit.domain.entity.user;
 
+import com.project.sidefit.domain.entity.time.BaseTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken extends BaseTime {
+public class Token extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,17 +22,23 @@ public class RefreshToken extends BaseTime {
     private Long key;
 
     @Column(nullable = false)
-    private String token;
+    private String refreshToken;
 
     public void updateToken(String token) {
-        this.token = token;
+        this.refreshToken = token;
     }
 
-    public static RefreshToken createRefreshToken(Long key, String token) {
-        RefreshToken refreshToken = new RefreshToken();
+    @Builder
+    public Token(Long key, String refreshToken) {
+        this.key = key;
+        this.refreshToken = refreshToken;
+    }
+
+    public static Token createToken(Long key, String token) {
+        Token refreshToken = new Token();
 
         refreshToken.key = key;
-        refreshToken.token = token;
+        refreshToken.refreshToken = token;
 
         return refreshToken;
     }

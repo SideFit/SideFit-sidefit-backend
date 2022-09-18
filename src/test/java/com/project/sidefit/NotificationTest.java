@@ -3,13 +3,13 @@ package com.project.sidefit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.config.security.JwtProvider;
 import com.project.sidefit.domain.entity.Image;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.enums.NotificationType;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.notification.NotificationService;
-import com.project.sidefit.domain.service.security.SignService;
+import com.project.sidefit.domain.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,10 +51,10 @@ public class NotificationTest {
     private NotificationService notificationService;
 
     @Autowired
-    private SignService signService;
+    private AuthService signService;
 
     @Autowired
-    private UserJpaRepo userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ImageRepository imageRepository;

@@ -1,10 +1,11 @@
 package com.project.sidefit.domain.service;
 
 import com.project.sidefit.domain.entity.*;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.repository.ApplyRepository;
 import com.project.sidefit.domain.repository.BookmarkRepository;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import com.project.sidefit.domain.repository.project.KeywordRepository;
@@ -26,7 +27,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectUserRepository projectUserRepository;
     private final RecruitRepository recruitRepository;
-    private final UserJpaRepo userRepository;
+    private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final BookmarkRepository bookmarkRepository;
     private final ApplyRepository applyRepository;

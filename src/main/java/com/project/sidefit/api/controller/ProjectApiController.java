@@ -1,7 +1,7 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ProjectService;

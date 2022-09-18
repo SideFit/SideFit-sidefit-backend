@@ -4,7 +4,7 @@ import com.project.sidefit.api.dto.PasswordRequestDto;
 import com.project.sidefit.api.dto.UserRequestDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.service.UserService;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserListDto;

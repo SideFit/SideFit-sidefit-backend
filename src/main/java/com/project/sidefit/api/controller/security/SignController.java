@@ -4,7 +4,7 @@ import com.project.sidefit.api.dto.jwt.TokenRequestDto;
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.api.dto.sign.*;
 import com.project.sidefit.domain.service.dto.TokenDto;
-import com.project.sidefit.domain.service.security.SignService;
+import com.project.sidefit.domain.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -20,7 +20,18 @@ import org.springframework.web.bind.annotation.*;
 public class SignController {
 
 
-    private final SignService signService;
+    private final AuthService signService;
+
+    // 소셜로그인 redirect 체크용
+    @GetMapping("/redirect")
+    public String redirect(@RequestParam(required = false) String accessToken, @RequestParam(required = false) String refreshToken) {
+
+        log.info("access token : {}", accessToken);
+        log.info("refresh token : {}", refreshToken);
+
+        return "ok";
+    }
+
 
     /**
      * 이메일 중복 확인
