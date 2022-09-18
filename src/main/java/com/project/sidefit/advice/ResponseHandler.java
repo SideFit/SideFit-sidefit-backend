@@ -22,18 +22,18 @@ public class ResponseHandler {
     public Response getFailureResponse(ExceptionType exceptionType, Object... args) {
         return Response.failure(getCode(exceptionType.getCode()), getMessage(exceptionType.getMessage(), args));
     }
-    
-    // 에러 코드 추출
+
+    // error code 추출
     private Integer getCode(String key) {
         return Integer.valueOf(messageSource.getMessage(key, null, null));
     }
-    
-    // 인자 없는 에러 메시지 추출
+
+    // 인자 없는 error message 추출
     private String getMessage(String key) {
         return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
     }
 
-    // 인자 있는 에러 메시지 추출
+    // 인자 있는 error message 추출
     private String getMessage(String key, Object... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }

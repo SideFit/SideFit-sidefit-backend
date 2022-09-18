@@ -17,12 +17,17 @@ public class Portfolio extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     private String title;
 
     @Column(name = "portfolio_url")
     private String url;
+
+    public Portfolio(String title, String url) {
+        this.title = title;
+        this.url = url;
+    }
 }

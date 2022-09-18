@@ -71,10 +71,18 @@ public class User extends BaseTime implements UserDetails {
     @JoinColumn(name = "user_id")
     private List<Tech> teches = new ArrayList<>();
 
+    // Portfolio
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private List<Portfolio> portfolios = new ArrayList<>();
+
+
     // mbti
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
     private Mbti mbti;
+
+
 
     public static User createUser(String email, String password, String nickname, String job) {
         User user = new User();
@@ -101,7 +109,7 @@ public class User extends BaseTime implements UserDetails {
     }
 
     public void updateUser(String job, String introduction, List<Tag> tags, List<Favorite> favorites,
-                           List<CurrentStatus> currentStatuses, List<Tech> teches, Mbti mbti) {
+                           List<CurrentStatus> currentStatuses, List<Tech> teches, List<Portfolio> portfolios, Mbti mbti, Image image) {
 
         this.job = job;
         this.introduction = introduction;
@@ -118,7 +126,11 @@ public class User extends BaseTime implements UserDetails {
         this.teches.clear();
         this.teches.addAll(teches);
 
+        this.portfolios.clear();
+        this.portfolios.addAll(portfolios);
+
         this.mbti = mbti;
+        this.image = image;
     }
 
     @Override

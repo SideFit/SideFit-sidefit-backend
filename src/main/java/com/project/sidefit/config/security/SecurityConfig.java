@@ -48,9 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/image/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/users", "/api/user/*").permitAll()
                 .antMatchers("/docs/**", "/api/auth/**", "/api/user/password/**").permitAll()
                 .antMatchers("/api/project/**", "/api/project/search/**", "/api/project/keyword-search").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/healthcheck").permitAll()
+                .antMatchers("/api/exception/**").permitAll()
                 .anyRequest().hasRole("USER")
 
                 .and()
@@ -75,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://sidefit.s3-website.ap-northeast-2.amazonaws.com/"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

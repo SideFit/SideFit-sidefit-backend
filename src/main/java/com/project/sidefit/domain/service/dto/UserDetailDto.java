@@ -24,19 +24,28 @@ public class UserDetailDto {
     private List<String> teches;
     private List<String> tags;
 
+    private List<PortfolioDto> portfolios;
+
+    private String imageUrl;
+
     // TODO Portfolio list 추가
 
-    public UserDetailDto(User user) {
-        id = user.getId();
-        mbti = user.getMbti();
+    public UserDetailDto(User user, String imageUrl) {
+        this.id = user.getId();
+        this.mbti = user.getMbti();
 
-        currentStatuses = user.getCurrentStatuses().stream()
+        this.currentStatuses = user.getCurrentStatuses().stream()
                 .map(status -> status.getStatus()).collect(Collectors.toList());
-        favorites = user.getFavorites().stream()
+        this.favorites = user.getFavorites().stream()
                 .map(favorite -> favorite.getField()).collect(Collectors.toList());
-        teches = user.getTeches().stream()
+        this.teches = user.getTeches().stream()
                 .map(tech -> tech.getStack()).collect(Collectors.toList());
-        tags = user.getTags().stream()
+        this.tags = user.getTags().stream()
                 .map(tag -> tag.getName()).collect(Collectors.toList());
+
+        this.portfolios = user.getPortfolios().stream()
+                .map(portfolio -> new PortfolioDto(portfolio.getTitle(), portfolio.getUrl())).collect(Collectors.toList());
+
+        this.imageUrl = imageUrl;
     }
 }

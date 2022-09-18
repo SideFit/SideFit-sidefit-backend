@@ -14,8 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class UserDto {
 
-    // 사진
-
     // 직무
     private String job;
 
@@ -38,4 +36,5 @@ public class UserDto {
     private List<String> teches;
 
     // URL
+    private List<PortfolioDto> portfolios;
 }
