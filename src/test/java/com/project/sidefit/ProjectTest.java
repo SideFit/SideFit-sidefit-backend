@@ -2,14 +2,15 @@ package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.domain.entity.*;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.project.KeywordRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import com.project.sidefit.domain.service.ProjectService;
 import com.project.sidefit.domain.service.dto.TokenDto;
-import com.project.sidefit.domain.service.security.SignService;
+import com.project.sidefit.domain.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,10 +54,10 @@ public class ProjectTest {
     private ProjectService projectService;
 
     @Autowired
-    private SignService signService;
+    private AuthService signService;
 
     @Autowired
-    private UserJpaRepo userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ProjectRepository projectRepository;

@@ -3,10 +3,10 @@ package com.project.sidefit.domain.service;
 import com.project.sidefit.domain.entity.Apply;
 import com.project.sidefit.domain.entity.Project;
 import com.project.sidefit.domain.entity.ProjectUser;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.enums.NotificationType;
 import com.project.sidefit.domain.repository.ApplyRepository;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import com.project.sidefit.domain.service.notification.NotificationService;
@@ -27,7 +27,7 @@ import static com.project.sidefit.api.dto.ProjectDto.*;
 public class ApplyService {
 
     private final ApplyRepository applyRepository;
-    private final UserJpaRepo userRepository;
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ProjectUserRepository projectUserRepository;
     private final NotificationService notificationService;

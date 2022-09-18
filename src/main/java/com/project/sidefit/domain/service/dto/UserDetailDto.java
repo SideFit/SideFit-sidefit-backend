@@ -1,7 +1,7 @@
 package com.project.sidefit.domain.service.dto;
 
 import com.project.sidefit.domain.entity.Mbti;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

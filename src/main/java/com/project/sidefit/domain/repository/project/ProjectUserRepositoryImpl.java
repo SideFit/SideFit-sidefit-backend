@@ -13,7 +13,8 @@ import static com.project.sidefit.api.dto.ProjectDto.*;
 import static com.project.sidefit.domain.entity.QImage.*;
 import static com.project.sidefit.domain.entity.QProject.*;
 import static com.project.sidefit.domain.entity.QProjectUser.*;
-import static com.project.sidefit.domain.entity.QUser.*;
+import static com.project.sidefit.domain.entity.user.QUser.user;
+
 
 @Repository
 @RequiredArgsConstructor

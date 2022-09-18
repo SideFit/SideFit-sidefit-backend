@@ -1,8 +1,8 @@
 package com.project.sidefit.domain.service.notification;
 
 import com.project.sidefit.domain.entity.Notification;
-import com.project.sidefit.domain.entity.User;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.notification.EmitterRepository;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
-    private final UserJpaRepo userRepository;
+    private final UserRepository userRepository;
 
     private static final Long DEFAULT_TIMEOUT = 60 * 60 * 1000L;
 

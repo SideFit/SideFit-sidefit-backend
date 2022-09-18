@@ -1,8 +1,8 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.User;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.ProjectService;
@@ -22,7 +22,7 @@ public class ApplyApiController {
 
     private final ApplyService applyService;
     private final ProjectService projectService;
-    private final UserJpaRepo userRepository;
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
     @PostMapping("/project/apply")

@@ -2,7 +2,7 @@ package com.project.sidefit.domain.repository;
 
 import com.project.sidefit.domain.entity.Apply;
 import com.project.sidefit.domain.entity.Project;
-import com.project.sidefit.domain.entity.User;
+import com.project.sidefit.domain.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -3,9 +3,11 @@ package com.project.sidefit.domain.service;
 import com.project.sidefit.advice.exception.CTokenNotFound;
 import com.project.sidefit.advice.exception.CUserNotFoundException;
 import com.project.sidefit.domain.entity.*;
-import com.project.sidefit.domain.repository.ConfirmationTokenJpaRepo;
+
+import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.domain.repository.ConfirmationTokenRepository;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserJpaRepo;
+import com.project.sidefit.domain.repository.UserRepository;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
@@ -27,8 +29,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final UserJpaRepo userJpaRepo;
-    private final ConfirmationTokenJpaRepo confirmationTokenJpaRepo;
+    private final UserRepository userJpaRepo;
+    private final ConfirmationTokenRepository confirmationTokenJpaRepo;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
     private final S3Service s3Service;

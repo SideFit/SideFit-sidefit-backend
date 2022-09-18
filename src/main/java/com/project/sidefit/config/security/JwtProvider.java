@@ -59,10 +59,10 @@ public class JwtProvider {
                 .compact();
 
         return TokenDto.builder()
-                .grantType("Bearer")
+//                .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .accessTokenExpireDate(ACCESSTOKEN_VALID_MILLISECOND)
+//                .accessTokenExpireDate(ACCESSTOKEN_VALID_MILLISECOND)
                 .build();
     }
 
@@ -90,7 +90,8 @@ public class JwtProvider {
 
     // 헤더에서 토큰 가져오기
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("X-AUTH-TOKEN");
+        return request.getHeader("Authorization");
+//        return request.getHeader("X-AUTH-TOKEN");
     }
 
     public boolean validationToken(String token) {

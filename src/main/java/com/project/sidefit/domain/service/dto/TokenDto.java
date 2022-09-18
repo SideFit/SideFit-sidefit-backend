@@ -9,8 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 public class TokenDto {
 
-    private String grantType;
+//    private String grantType;
     private String accessToken;
     private String refreshToken;
-    private Long accessTokenExpireDate;
+//    private Long accessTokenExpireDate;
 }

@@ -1,5 +1,6 @@
-package com.project.sidefit.domain.entity;
+package com.project.sidefit.domain.entity.user;
 
+import com.project.sidefit.domain.entity.time.BaseTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
