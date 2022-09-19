@@ -7,7 +7,7 @@ import com.project.sidefit.config.security.token.UserPrincipal;
 import com.project.sidefit.domain.entity.user.Provider;
 import com.project.sidefit.domain.entity.user.Role;
 import com.project.sidefit.domain.entity.user.User;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

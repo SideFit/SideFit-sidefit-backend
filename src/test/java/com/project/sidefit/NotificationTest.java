@@ -1,12 +1,12 @@
 package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.sidefit.config.security.JwtProvider;
+import com.project.sidefit.config.security.delete.JwtProvider;
 import com.project.sidefit.domain.entity.Image;
 import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.enums.NotificationType;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.notification.NotificationService;
 import com.project.sidefit.domain.service.auth.AuthService;

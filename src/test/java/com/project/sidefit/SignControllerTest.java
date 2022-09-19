@@ -287,10 +287,11 @@ public class SignControllerTest {
     @DisplayName("이메일 login : Post /api/auth/login")
     public void email_login() throws Exception {
         //given
-        TokenDto response = TokenDto.builder().grantType("Bearer")
+        TokenDto response = TokenDto.builder()//.grantType("Bearer")
                 .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDI4Mzc0NCwiZXhwIjoxNjYwMjg3MzQ0fQ.oE64nKkVmFqRx0LgblAfMXvXDG9lU8sE57DG8heBeAU")
                 .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE0OTMzNDR9.UyY9pJtvBJnLXdlmp0Dk88LvAwFVlKg4-vHirAYxzvM")
-                .accessTokenExpireDate(3600000L).build();
+                //.accessTokenExpireDate(3600000L)
+                .build();
 
         given(signService.login(any(String.class), any(String.class))).willReturn(response);
 
@@ -324,18 +325,22 @@ public class SignControllerTest {
     @DisplayName("access token 재발급 : Post /api/auth/reissue")
     public void reissue() throws Exception {
         //given
-        TokenDto response = TokenDto.builder().grantType("Bearer")
+        TokenDto response = TokenDto.builder()
+                //.grantType("Bearer")
                 .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDI4Mzc0NCwiZXhwIjoxNjYwMjg3MzQ0fQ.oE64nKkVmFqRx0LgblAfMXvXDG9lU8sE57DG8heBeAU")
                 .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE0OTMzNDR9.UyY9pJtvBJnLXdlmp0Dk88LvAwFVlKg4-vHirAYxzvM")
-                .accessTokenExpireDate(3600000L).build();
+                //.accessTokenExpireDate(3600000L)
+                .build();
 
         given(signService.reissue(anyString(), anyString())).willReturn(response);
 
         //when
-        TokenDto request = TokenDto.builder().grantType("Bearer")
+        TokenDto request = TokenDto.builder()
+                //.grantType("Bearer")
                 .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDQxMTA5MiwiZXhwIjoxNjYwNDE0NjkyfQ.u1Bz9pEvDy68VJtr233x8E6z3Ua8e5ayhq8TlCc3DeI")
                 .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjE2MjA2OTJ9.mG-udQ3mogvgP9ak3rnvU5sW8h3q4sntldz_FUhAIU4")
-                .accessTokenExpireDate(3600000L).build();
+                //.accessTokenExpireDate(3600000L)
+                .build();
 
         ResultActions result = this.mockMvc.perform(post("/api/auth/reissue")
                 .contentType(APPLICATION_JSON)

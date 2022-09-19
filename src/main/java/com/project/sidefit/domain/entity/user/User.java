@@ -1,5 +1,6 @@
 package com.project.sidefit.domain.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.sidefit.domain.entity.*;
 import com.project.sidefit.domain.entity.time.BaseTime;
 import lombok.*;
@@ -22,14 +23,12 @@ public class User extends BaseTime {
     @JoinColumn(name = "image_id")
     private Image image;
 
-    // unique, not null
     @Column(nullable = false, unique = true)
     private String email;
 
-    // not null
+    @JsonIgnore
     private String password;
 
-    // not null
     // TODO Role enum 단일값? or RoleType 엔티티 List?
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @CollectionTable(

@@ -5,7 +5,7 @@ import com.project.sidefit.config.security.OAuth2Config;
 import com.project.sidefit.config.security.util.CookieUtil;
 import com.project.sidefit.domain.entity.user.Token;
 import com.project.sidefit.domain.repository.CustomAuthorizationRequestRepository;
-import com.project.sidefit.domain.repository.TokenRepository;
+import com.project.sidefit.domain.repository.user.TokenRepository;
 import com.project.sidefit.domain.service.auth.CustomTokenProviderService;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import lombok.RequiredArgsConstructor;

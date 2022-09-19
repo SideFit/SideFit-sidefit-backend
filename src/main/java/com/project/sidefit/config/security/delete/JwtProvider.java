@@ -1,4 +1,4 @@
-package com.project.sidefit.config.security;
+package com.project.sidefit.config.security.delete;
 
 import com.project.sidefit.advice.exception.CAuthenticationEntryPointException;
 import com.project.sidefit.domain.service.dto.TokenDto;

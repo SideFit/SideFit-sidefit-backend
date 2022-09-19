@@ -2,7 +2,7 @@ package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
 import com.project.sidefit.domain.entity.user.User;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ApplyService;
 import com.project.sidefit.domain.service.ProjectService;

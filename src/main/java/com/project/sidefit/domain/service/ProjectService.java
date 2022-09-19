@@ -5,7 +5,7 @@ import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.repository.ApplyRepository;
 import com.project.sidefit.domain.repository.BookmarkRepository;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.repository.project.ProjectUserRepository;
 import com.project.sidefit.domain.repository.project.KeywordRepository;

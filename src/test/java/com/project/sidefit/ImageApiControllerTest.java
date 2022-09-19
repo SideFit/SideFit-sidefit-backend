@@ -20,13 +20,13 @@ public class ImageApiControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Test
-    @DisplayName("Post /api/image : S3에 이미지 업로드")
-    public void 이미지_업로드() throws Exception {
-        //given
-
-        //when
-
-        //then
-    }
+//    @Test
+//    @DisplayName("Post /api/image : S3에 이미지 업로드")
+//    public void 이미지_업로드() throws Exception {
+//        //given
+//
+//        //when
+//
+//        //then
+//    }
 }

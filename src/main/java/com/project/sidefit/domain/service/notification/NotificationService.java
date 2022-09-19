@@ -2,7 +2,7 @@ package com.project.sidefit.domain.service.notification;
 
 import com.project.sidefit.domain.entity.Notification;
 import com.project.sidefit.domain.entity.user.User;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.repository.notification.EmitterRepository;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;

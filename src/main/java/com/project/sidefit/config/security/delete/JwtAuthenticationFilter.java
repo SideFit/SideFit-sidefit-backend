@@ -1,5 +1,6 @@
-package com.project.sidefit.config.security;
+package com.project.sidefit.config.security.delete;
 
+import com.project.sidefit.config.security.delete.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

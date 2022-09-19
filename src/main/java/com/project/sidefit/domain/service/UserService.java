@@ -7,7 +7,7 @@ import com.project.sidefit.domain.entity.*;
 import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.repository.ConfirmationTokenRepository;
 import com.project.sidefit.domain.repository.ImageRepository;
-import com.project.sidefit.domain.repository.UserRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;

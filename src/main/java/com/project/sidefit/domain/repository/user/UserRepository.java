@@ -1,4 +1,4 @@
-package com.project.sidefit.domain.repository;
+package com.project.sidefit.domain.repository.user;
 
 import com.project.sidefit.domain.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

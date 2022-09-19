@@ -1,18 +1,15 @@
 package com.project.sidefit.domain.service.auth;
 
 import com.project.sidefit.advice.exception.CEmailLoginFailedException;
-import com.project.sidefit.advice.exception.CRefreshTokenException;
 import com.project.sidefit.advice.exception.CTokenNotFound;
-import com.project.sidefit.advice.exception.CUserNotFoundException;
-import com.project.sidefit.config.security.JwtProvider;
 import com.project.sidefit.domain.entity.ConfirmationToken;
 import com.project.sidefit.domain.entity.user.Token;
 import com.project.sidefit.domain.entity.user.User;
 import com.project.sidefit.domain.entity.user.UserPrev;
 import com.project.sidefit.domain.repository.ConfirmationTokenRepository;
-import com.project.sidefit.domain.repository.TokenRepository;
-import com.project.sidefit.domain.repository.UserRepository;
-import com.project.sidefit.domain.repository.UserPrevRepository;
+import com.project.sidefit.domain.repository.user.TokenRepository;
+import com.project.sidefit.domain.repository.user.UserRepository;
+import com.project.sidefit.domain.repository.user.UserPrevRepository;
 import com.project.sidefit.domain.service.dto.TokenDto;
 import com.project.sidefit.domain.service.mail.MailService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
