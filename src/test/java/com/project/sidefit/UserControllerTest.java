@@ -2,11 +2,12 @@ package com.project.sidefit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sidefit.api.dto.PasswordRequestDto;
+import com.project.sidefit.api.dto.PortfolioRequestDto;
 import com.project.sidefit.api.dto.UserRequestDto;
 import com.project.sidefit.api.dto.sign.EmailRequestDto;
 import com.project.sidefit.domain.entity.Mbti;
 import com.project.sidefit.domain.service.UserService;
-import com.project.sidefit.domain.service.dto.TokenDto;
+import com.project.sidefit.domain.service.dto.PortfolioDto;
 import com.project.sidefit.domain.service.dto.UserDetailDto;
 import com.project.sidefit.domain.service.dto.UserDto;
 import com.project.sidefit.domain.service.dto.UserListDto;
@@ -17,13 +18,15 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -63,7 +66,7 @@ public class UserControllerTest {
         List<UserListDto> response = new ArrayList<>();
         UserListDto user = UserListDto.builder().id(1L).nickname("testUser")
                 .job("backend").introduction("자기소개 글")
-                .tags(new ArrayList<String>()).build();
+                .tags(Arrays.asList("#포트폴리오용", "#직장인")).build();
         response.add(user);
 
         /*String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImlhdCI6MTY2MDI4Mzc0NCwiZXhwIjoxNjYwMjg3MzQ0fQ.oE64nKkVmFqRx0LgblAfMXvXDG9lU8sE57DG8heBeAU";
@@ -107,11 +110,15 @@ public class UserControllerTest {
     @DisplayName("회원 상세조회 : Get /api/user/{id}")
     public void findDetail() throws Exception {
         //given
+        PortfolioDto portfolioDto = PortfolioDto.builder().title("깃").url("https://test").build();
+
         UserDetailDto user = UserDetailDto.builder().id(1L).mbti(Mbti.INFP)
-                .currentStatuses(new ArrayList<String>())
-                .favorites(new ArrayList<String>())
-                .teches(new ArrayList<String>())
-                .tags(new ArrayList<String>())
+                .currentStatuses(Arrays.asList("구직 중", "포트폴리오 제작 중"))
+                .favorites(Arrays.asList("금융", "여행"))
+                .teches(Arrays.asList("Java", "Spring"))
+                .tags(Arrays.asList("#포트폴리오용", "#직장인"))
+                .portfolios(Arrays.asList(portfolioDto))
+                .imageUrl("s3://sidefit-bucket/image/09b862cb-1c00-4d87-a8e8-dc7ceb4e7761.png")
                 .build();
 
         given(userService.findDetail(anyLong())).willReturn(user);
@@ -135,7 +142,10 @@ public class UserControllerTest {
                                 fieldWithPath("result.data.currentStatuses").type(ARRAY).description("현재 상태"),
                                 fieldWithPath("result.data.favorites").type(ARRAY).description("좋아하는 분야"),
                                 fieldWithPath("result.data.teches").type(ARRAY).description("기술 스택"),
-                                fieldWithPath("result.data.tags").type(ARRAY).description("태그")
+                                fieldWithPath("result.data.tags").type(ARRAY).description("태그"),
+                                fieldWithPath("result.data.portfolios[].title").type(STRING).description("포트폴리오 이름"),
+                                fieldWithPath("result.data.portfolios[].url").type(STRING).description("포트폴리오 링크"),
+                                fieldWithPath("result.data.imageUrl").type(STRING).description("이미지 url")
                         )
                 ));
     }
@@ -200,9 +210,25 @@ public class UserControllerTest {
 //    @WithMockUser
 //    @DisplayName("프로필 변경 : Patch /api/user/{id}")
 //    public void 프로필_변경() throws Exception {
+//
 //        //given
-//        UserRequestDto userRequestDto = UserRequestDto.builder().job("frontend").introduction("hi~test").tags(new ArrayList<>()).currentStatuses(new ArrayList<>())
-//                .favorites(new ArrayList<>()).teches(new ArrayList<>()).mbti(Mbti.ENFP).build();
+//        PortfolioRequestDto portfolioDto = PortfolioRequestDto.builder().title("깃").url("https://test").build();
+//
+//        MockMultipartFile image = new MockMultipartFile("image", "image.png", "image/png", "<<png data>>".getBytes());
+//        MockMultipartFile metadata = new MockMultipartFile("metadata", "", "application/json",
+//                "{ \"version\": \"1.0\"}".getBytes());
+//
+//
+////        multipart("/upload").file("file", "example".getBytes())
+//
+//
+//        UserRequestDto userRequestDto = UserRequestDto.builder().job("frontend").introduction("hi~test")
+//                .tags(Arrays.asList("#포트폴리오용", "#직장인"))
+//                .currentStatuses(Arrays.asList("구직 중", "포트폴리오 제작 중"))
+//                .favorites(Arrays.asList("금융", "여행"))
+//                .teches(Arrays.asList("Java", "Spring"))
+//                .portfolios(Arrays.asList(portfolioDto))
+//                .mbti(Mbti.ENFP).build();
 //
 //        UserDto userDto = userRequestDto.toUserDto();
 //        willDoNothing().given(userService).updateUser(anyLong(), eq(userDto));

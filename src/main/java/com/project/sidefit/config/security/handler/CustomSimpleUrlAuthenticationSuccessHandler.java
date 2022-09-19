@@ -56,6 +56,9 @@ public class CustomSimpleUrlAuthenticationSuccessHandler extends SimpleUrlAuthen
 
 //        DefaultAssert.isAuthentication( !(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) );
 
+
+        log.info("redirectUri is present: {}, !isAuthorizedRedirectUri: {}", redirectUri.isPresent(), !isAuthorizedRedirectUri(redirectUri.get()));
+
         if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
         }
