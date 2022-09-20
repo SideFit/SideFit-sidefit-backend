@@ -544,6 +544,7 @@ public class ProjectTest {
                                 fieldWithPath("result.data[].id").type(NUMBER).description("프로젝트 id"),
                                 fieldWithPath("result.data[].title").type(STRING).description("프로젝트 제목"),
                                 fieldWithPath("result.data[].type").type(NUMBER).description("프로젝트 유형"),
+                                fieldWithPath("result.data[].field").type(STRING).description("프로젝트 분야"),
                                 fieldWithPath("result.data[].hashtag").type(STRING).description("프로젝트 해시태그"),
                                 fieldWithPath("result.data[].status").type(BOOLEAN).description("프로젝트 진행 상태"),
                                 fieldWithPath("result.data[].createdDate").type(STRING).description("생성 일자"),
