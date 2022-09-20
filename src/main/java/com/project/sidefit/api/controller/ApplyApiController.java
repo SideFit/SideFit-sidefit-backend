@@ -1,7 +1,7 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.config.security.token.UserPrincipal;
 import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ApplyService;
@@ -25,13 +25,24 @@ public class ApplyApiController {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+    @GetMapping("/apply/list")
+    public Response getApplyList(@AuthenticationPrincipal UserPrincipal user) {
+        return Response.success(applyService.findApplyProjectDtoWithUser(user.getId()));
+    }
+
+    // TODO
+    @GetMapping("/apply/users")
+    public Response getApplyUsers(@AuthenticationPrincipal UserPrincipal user) {
+        return Response.success();
+    }
+
     @PostMapping("/project/apply")
-    public Response apply(@AuthenticationPrincipal User user, @RequestParam String projectId, @Valid @RequestBody ApplyRequestDto ApplyRequestDto) {
+    public Response apply(@AuthenticationPrincipal UserPrincipal user, @RequestParam String projectId, @Valid @RequestBody ApplyRequestDto ApplyRequestDto) {
         return Response.success(applyService.applyToTeam(user.getId(), Long.valueOf(projectId), ApplyRequestDto));
     }
 
     @PostMapping("/project/invite")
-    public Response invite(@AuthenticationPrincipal User user, @RequestParam String receiverId, @RequestParam String projectId, @Valid @RequestBody InviteRequestDto inviteRequestDto) {
+    public Response invite(@AuthenticationPrincipal UserPrincipal user, @RequestParam String receiverId, @RequestParam String projectId, @Valid @RequestBody InviteRequestDto inviteRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 관리 권한이 없습니다.");
@@ -41,7 +52,7 @@ public class ApplyApiController {
 
     // 프로젝트 팀장이 유저 지원 처리
     @PostMapping("/project/apply-response")
-    public Response getApplyResponse(@AuthenticationPrincipal User user, @RequestParam String applyId, @RequestParam Boolean flag) {
+    public Response getApplyResponse(@AuthenticationPrincipal UserPrincipal user, @RequestParam String applyId, @RequestParam Boolean flag) {
         ApplyResponseDto apply = applyService.findApplyDto(Long.valueOf(applyId));
         ProjectResponseDto project = projectService.findProjectDto(apply.getProjectId());
         if (!project.getUserId().equals(user.getId())) {
@@ -56,7 +67,7 @@ public class ApplyApiController {
 
     // 유저가 프로젝트 참여 제안 처리
     @PostMapping("/project/invite-response")
-    public Response getInviteResponse(@AuthenticationPrincipal User user, @RequestParam String applyId, @RequestParam Boolean flag) {
+    public Response getInviteResponse(@AuthenticationPrincipal UserPrincipal user, @RequestParam String applyId, @RequestParam Boolean flag) {
         ApplyResponseDto apply = applyService.findApplyDto(Long.valueOf(applyId));
         if (projectRepository.findById(apply.getProjectId()).isEmpty()) {
             return Response.failure(-1000, "프로젝트가 존재하지 않습니다.");

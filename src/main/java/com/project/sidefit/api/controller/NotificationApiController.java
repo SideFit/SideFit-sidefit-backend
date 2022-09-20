@@ -1,7 +1,7 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.config.security.token.UserPrincipal;
 import com.project.sidefit.domain.repository.user.UserRepository;
 import com.project.sidefit.domain.repository.notification.NotificationRepository;
 import com.project.sidefit.domain.service.notification.NotificationService;
@@ -28,19 +28,19 @@ public class NotificationApiController {
 
     @GetMapping(value = "/sse/connect", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)
-    public Response connect(@RequestHeader(value = "Last-Event-ID", defaultValue = "", required = false) String lastEventId, @AuthenticationPrincipal User user) {
+    public Response connect(@RequestHeader(value = "Last-Event-ID", defaultValue = "", required = false) String lastEventId, @AuthenticationPrincipal UserPrincipal user) {
         notificationService.connect(user.getId(), lastEventId);
         return Response.success();
     }
 
     @PostMapping("/notification/send")
-    public Response sendNotification(@AuthenticationPrincipal User user, @RequestParam String receiverId, @Valid @RequestBody NotificationRequestDto notificationRequestDto) {
+    public Response sendNotification(@AuthenticationPrincipal UserPrincipal user, @RequestParam String receiverId, @Valid @RequestBody NotificationRequestDto notificationRequestDto) {
         notificationService.sendNotification(notificationRequestDto, user.getId(), Long.valueOf(receiverId));
         return Response.success();
     }
 
     @GetMapping("/notification/list")
-    public Response getNotifications(@AuthenticationPrincipal User user) {
+    public Response getNotifications(@AuthenticationPrincipal UserPrincipal user) {
         List<NotificationQueryDto> notifications = notificationRepository.findNotificationsWithReceiverId(user.getId());
         List<Long> notificationIds = notifications.stream().map(NotificationQueryDto::getId).collect(Collectors.toList());
         notificationService.checkAll(notificationIds);
@@ -49,7 +49,7 @@ public class NotificationApiController {
     }
 
     @GetMapping("/notification/simple")
-    public Response getSimpleNotifications(@AuthenticationPrincipal User user) {
+    public Response getSimpleNotifications(@AuthenticationPrincipal UserPrincipal user) {
         return Response.success(notificationService.findCountAndImageUrlWithReceiverId(user.getId()));
     }
 }

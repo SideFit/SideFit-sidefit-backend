@@ -1,7 +1,7 @@
 package com.project.sidefit.api.controller;
 
 import com.project.sidefit.api.dto.response.Response;
-import com.project.sidefit.domain.entity.user.User;
+import com.project.sidefit.config.security.token.UserPrincipal;
 import com.project.sidefit.domain.enums.SearchCondition;
 import com.project.sidefit.domain.repository.project.ProjectRepository;
 import com.project.sidefit.domain.service.ProjectService;
@@ -29,7 +29,7 @@ public class ProjectApiController {
     }
 
     @PostMapping("/project")
-    public Response createProject(@AuthenticationPrincipal User user, @RequestParam(required = false) String imageId, @Valid @RequestBody ProjectRequestDto projectRequestDto) {
+    public Response createProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam(required = false) String imageId, @Valid @RequestBody ProjectRequestDto projectRequestDto) {
         if (imageId == null && projectRequestDto.getImageUrl() == null) {
             return Response.failure(-1000, "이미지를 선택해주세요.");
         }
@@ -37,7 +37,7 @@ public class ProjectApiController {
     }
 
     @PatchMapping("/project")
-    public Response updateProject(@AuthenticationPrincipal User user, @RequestParam String projectId, @RequestParam(required = false) String imageId,
+    public Response updateProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam String projectId, @RequestParam(required = false) String imageId,
                                   @Valid @RequestBody ProjectRequestDto projectRequestDto) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
@@ -51,7 +51,7 @@ public class ProjectApiController {
     }
 
     @PatchMapping("/project/end")
-    public Response endProject(@AuthenticationPrincipal User user, @RequestParam String projectId) {
+    public Response endProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam String projectId) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 종료 권한이 없습니다.");
@@ -61,7 +61,7 @@ public class ProjectApiController {
     }
 
     @DeleteMapping("/project")
-    public Response deleteProject(@AuthenticationPrincipal User user, @RequestParam String projectId) {
+    public Response deleteProject(@AuthenticationPrincipal UserPrincipal user, @RequestParam String projectId) {
         ProjectResponseDto project = projectService.findProjectDto(Long.valueOf(projectId));
         if (!project.getUserId().equals(user.getId())) {
             return Response.failure(-1000, "프로젝트 삭제 권한이 없습니다.");
@@ -76,7 +76,7 @@ public class ProjectApiController {
     }
 
     @GetMapping("/project/pre-member/list")
-    public Response getProjectPreMembers(@AuthenticationPrincipal User user) {
+    public Response getProjectPreMembers(@AuthenticationPrincipal UserPrincipal user) {
         List<MemberResponseDto> preMembers = projectService.findPreMemberDtoListWithUserId(user.getId());
         preMembers.removeIf(preMember -> preMember.getId().equals(user.getId())); // 현재 로그인한 회원 제외
 
@@ -84,7 +84,7 @@ public class ProjectApiController {
     }
 
     @GetMapping("/project/recommend/list")
-    public Response getRecommendProjects(@AuthenticationPrincipal User user) {
+    public Response getRecommendProjects(@AuthenticationPrincipal UserPrincipal user) {
         return Response.success(projectService.findRecommendProjectDtoListWithUserId(user.getId()));
     }
 
